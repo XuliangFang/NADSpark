@@ -18,10 +18,10 @@ class AnomalyDetection {
 	def kmeans(NadsRDD: RDD[])
 	{
 		val features = Array("dnsBehavior",
-							 "Out-In-Packages",
-							 "SYN-PSH-Packages",
-							 "packagesIntervalTime",
-							 "packagesSize")
+												 "Out-In-Packages",
+												 "SYN-PSH-Packages",
+												 "packagesIntervalTime",
+												 "packagesSize")
 
 		println("Filtering NadsRDD...")
 		val NadsRDD = NadsRDD.map{
@@ -37,7 +37,7 @@ class AnomalyDetection {
 			return
 
 		println("Calculating some variables to normalize data...")
-		
+
 	}
 
 }
