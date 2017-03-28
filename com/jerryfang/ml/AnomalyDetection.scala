@@ -10,34 +10,35 @@ import org.apache.spark.rdd.RDD
 
 class AnomalyDetection {
 
-	def run(NadsRDD: RDD[], spark: SparkContext)
-	{
-		kmeans(NadsRDD)
-	}
+    def run(NadsRDD: RDD[], spark: SparkContext)
+    {
+        kmeans(NadsRDD)
+    }
 
-	def kmeans(NadsRDD: RDD[])
-	{
-		val features = Array("dnsBehavior",
-												 "Out-In-Packages",
-												 "SYN-PSH-Packages",
-												 "packagesIntervalTime",
-												 "packagesSize")
+    def kmeans(NadsRDD: RDD[])
+    {
+        val features = Array("dnsBehavior",
+                             "Out-In-Packages",
+                             "SYN-PSH-Packages",
+                             "packagesIntervalTime",
+                             "packagesSize")
 
-		println("Filtering NadsRDD...")
-		val NadsRDD = NadsRDD.map{
-			case(id, result) => {
-				val map: Map[String, String] = new HashMap[String, String]
-			}
-		}
+        println("Filtering NadsRDD...")
+        val NadsRDD = NadsRDD.map{
+            case(id, result) => {
+                val map: Map[String, String] = new HashMap[String, String]
+            }
+        }
 
-		println("Counting NadsRDD...")
-		val rddTotalSize = NadsRDD.count()
-		println("NadsRDD has"+ rddTotalSize +" rows!")
-		if(rddTotalSize == 0)
-			return
+        println("Counting NadsRDD...")
+        val rddTotalSize = NadsRDD.count()
+        println("NadsRDD has"+ rddTotalSize +" rows!")
+        if(rddTotalSize == 0)
+            return
 
-		println("Calculating some variables to normalize data...")
-
-	}
+        println("Calculating some variables to normalize data...")
+        println("Estimating...")
+        
+    }
 
 }
