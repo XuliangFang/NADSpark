@@ -7,3 +7,6 @@
 * 测试数据采用了UCI的数据。UCI 是一个关于机器学习测试数据的下载中心站点，里面包含了适用于做聚类，分群，回归等各种机器学习问题的数据集。Link: http://archive.ics.uci.edu/ml/datasets/Wholesale+customers
 
 > Note: build.sbt 注意library dependency问题（编译时遇到mllib is not a member of org.apache.spark）
+>
+> spark-submit --class "KMeansClustering" ./target/scala-2.11/kmeans-project_2.11-1.0.jar /user/kmeans/kmeans_Training.txt /user/kmeans/kmeans_Test.txt 8 30 3
+
