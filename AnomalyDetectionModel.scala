@@ -62,7 +62,17 @@ object KMeansClustering {
         predictedClusterIndex)
     })
 
-    println("Spark MLlib K-means clustering test finished.")
+    println("--------------------------------------->>>>>>>>>>>>>")
+    println("--------------------------------------->>>>>>>>>>>>>")
+    println("--------------------------------------->>>>>>>>>>>>>")
+    println("Spark MLlib K-means clustering test STAGE 1 finished.")
+    println("Select a suitable K value::::::")
+    val ks:Array[Int] = Array(3 to 20)
+    ks.foreach(cluster => {
+        val model:KMeansModel = KMeans.train(parsedTrainingData, cluster, 30, 1)
+        val ssd = model.computeCost(parsedTrainingData)
+        println("sum of squared distances of points to their nearest center when k="+cluster + " --->>> " + ssd)
+        })
  }
 
  private def isColumnNameLine(line:String):Boolean = {
