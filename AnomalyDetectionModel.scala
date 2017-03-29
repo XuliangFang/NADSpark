@@ -1,6 +1,7 @@
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.rdd.RDD
 
 object KMeansClustering {
     def main (args: Array[String]) {
@@ -68,3 +69,4 @@ object KMeansClustering {
     if (line != null && line.contains("Channel")) true
     else false
  }
+}
