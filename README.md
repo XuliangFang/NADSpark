@@ -22,7 +22,7 @@ K值的选取：通过实验确定（10-100, 考察准确率与误报率）
 
 特征向量：<f1, f2, f3, f4, f5>
 
-### Implementation on Spark Using Scala
+### Implementation in Scala
 
 A example of using MLlib (K-Means)
 
@@ -59,3 +59,4 @@ object KMeansExample {
 }
 ```
 
+通过机器学习聚类的方法，可以将异常数据与正常数据分离开来。

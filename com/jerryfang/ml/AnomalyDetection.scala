@@ -38,7 +38,7 @@ class AnomalyDetection {
 
         println("Calculating some variables to normalize data...")
         println("Estimating...")
-        
+
     }
 
 }
