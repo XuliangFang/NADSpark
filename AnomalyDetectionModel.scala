@@ -67,7 +67,7 @@ object KMeansClustering {
     println("--------------------------------------->>>>>>>>>>>>>")
     println("Spark MLlib K-means clustering test STAGE 1 finished.")
     println("Select a suitable K value::::::")
-    val ks:Array[Int] = Array(3 to 20)
+    val ks:Array[Int] = (3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
     ks.foreach(cluster => {
         val model:KMeansModel = KMeans.train(parsedTrainingData, cluster, 30, 1)
         val ssd = model.computeCost(parsedTrainingData)
