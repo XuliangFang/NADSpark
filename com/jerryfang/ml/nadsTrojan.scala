@@ -1,5 +1,8 @@
 package com.jerryfang.ml
 
+import scala.collection.mutable.HashMap
+import scala.collection.mutable.Map
+import scala.collection.mutable.HashSet
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
@@ -43,6 +46,8 @@ object nadsTrojan {
         val parsedTestData = rawTestData.map(line => {
             Vectors.dense(line.split("\t").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
         })
+        //Maybe need modification here
+        val testDataSize = parsedTestData.collect().count()
         parsedTestData.collect().foreach(testDataLine => {
             val predictionClusterIndex: Int = clusters.predict(testDataLine)
             println("The point "+ testDataLine.toString + "belongs to cluser " + predictionClusterIndex)
@@ -52,13 +57,70 @@ object nadsTrojan {
         println("--------------------------------------->>>>>>>>>>>>>")
         println("--------------------------------------->>>>>>>>>>>>>")
         println("Simple Prediction finished.")
+
+        //labeling and raise event(normal or abnormal)
+        val clusterLabel = parsedTestData.map(data => {
+            val clusterPredict = clusters.predict(data)
+            (clusterPredict, data)
+        })
+
+        //statistic
+        /*val clusterLabelCount = clusterLabel.map({
+            case (clusterPredict, data) =>
+            val mapData: Map[(Int, String), (Double, Int)] = new HashMap[(Int, String), (Double, Int)]
+            mapData.put((clusterPredict, "Trojan"), (1.toDouble, 1))
+            mapData
+        }).reduceByKey((a, b) => {
+            b._2
+        })*/
+        val clusterLabelCount = clusterLabel.map({
+            case (clusterPredict, data) =>
+            val mapData: Map[Int, Int] = new Map[Int, Int]
+            mapData.put(clusterPredict, 1))
+            mapData
+        }).reduce((a, b) => {
+            b.keySet().toArray().map{
+                case key:(Int)=>
+                if(a.containsKey(key)){
+                    a.put(key, a.get(key)+b.get(key))
+                }
+                else{
+                    a.put(key, b.get(key))
+                }
+            }
+            a
+        })
+        //compute proportion of every cluster
+        val maxAnomalousClusterProportion = 0.05
+        val minDirtyProportion = 0.001
+        val threshold = maxAnomalousClusterProportion * testDataSize
+
+        println("Selecting anomalous cluster...")
+
+        val anomalousArray = clusterLabelCount.filter({
+            kv => kv._2.toDouble < threshold    
+        }).map(_._1)
+
+        if(anomalousArray.isEmpty){
+            println("There is no anomalous cluster...")
+        }
+        else{
+            println("Got anomalous clusters...---------->>>>>>>>")
+            anomalousArray.map({
+                clt => 
+                println("=======================================")
+                println("The index of anomalous cluster is " + clt.toString)
+            })
+        }
+        
+
         println("Begin to optimize K-means model by choosing a K value that takes minimum cost.")
 
         val ks:Array[Int] = (3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
         ks.foreach(clusterNum => {
             val model:KMeansModel = KMeans.train(parsedTrainingData, clusterNum, 30, 1)
             val cost = model.computeCost(parsedTrainingData)
-            println("Sum of quaed distances of points to their nearest center when K=" + clusterNum + " --->>> " + cost)
+            println("Sum of squared distances of points to their nearest center when K=" + clusterNum + " --->>> " + cost)
         })
     }
 
