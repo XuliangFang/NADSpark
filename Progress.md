@@ -10,7 +10,9 @@ Project Link: https://github.com/XuliangFang/NADSpark
 
 > Note: build.sbt 注意library dependency问题（编译时遇到mllib is not a member of org.apache.spark）
 >
-> spark-submit --class "KMeansClustering" ./target/scala-2.11/kmeans-project_2.11-1.0.jar /user/kmeans/kmeans_Training.txt /user/kmeans/kmeans_Test.txt 8 30 3
+> ```shell
+> $spark-submit --class "KMeansClustering" ./target/scala-2.11/kmeans-project_2.11-1.0.jar /user/kmeans/kmeans_Training.txt /user/kmeans/kmeans_Test.txt 8 30 3
+> ```
 
 ##### 思路整理
 
