@@ -27,3 +27,21 @@ Project Link: https://github.com/XuliangFang/NADSpark
 * 木马检测所需的结构化数据
 * 实验结果分析
 * Slides for Group Meeting
+
+今日工作主要是完善木马异常流量检测Kmeans算法的代码。木马检测所需要的结构化数据来源问题未完全解决。组会slides未完成。
+
+明天主要工作：测试木马检测聚类算法的代码。实验结果分析报告。组会。
+
+今日收获：
+
+```scala
+val a = List(1,2,3,4)
+val b = (5 /: a)(_+_)
+def /:[B](z:B)(op: (B,A) => B):B
+return op(...op(op(z, x_1), x_2), ..., x_n)
+```
+
+#### March 31th, 2017
+
+* 今日工作安排：
+
