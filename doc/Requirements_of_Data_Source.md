@@ -8,14 +8,15 @@
 
 k-means 算法接受输入量 k ；然后将n个数据对象划分为 k个聚类以便使得所获得的聚类满足：同一聚类中的对象相似度较高；而不同聚类中的对象相似度较小。聚类相似度是利用各聚类中对象的均值所获得一个“中心对象”（引力中心）来进行计算的。
 
-![450px-Iris_Flowers_Clustering_kMeans.svg](C:\Users\Jerry\Desktop\450px-Iris_Flowers_Clustering_kMeans.svg.png)
-
 #### Feature Selection
 
-* DNS行为
-* 上下行流量比例
-* SYN、PSH包数量占比
-* 报文间隔时间
-* 报文大小
+* **TCP会话时间长度 (Session Duration)**:  时间窗口内，第一个IP-pair session会话长度（从SYN到FIN）。P.S. 如果不好做，这项可以去掉。
+* **DNS行为** **(DNS behavior)**: 时间窗口内，请求DNS次数
+* **上下行包比例 (number of packages)**: 时间窗口内，IP->out包个数除以IP<-out包个数
+* **上下行字节比例(Bytes of packages)**: 时间窗口内，IP->out字节数除以IP<-out字节数
+* **SYN包数量占比 (Proportion of SYN packages)**: IP->out SYN packages
+* **PSH包数量占比 (Proportion of PSH packages)**: IP<-out PSH packages
+* **报文平均间隔时间 (Mean Interval Time)**: 时间窗口内，第一个IP-pair Session的报文平均间隔时间
+* **size <= 62字节的报文数量占比 (Proportion of small packages)**: 时间窗口内小数据包占总数据包个数比例
 
-算法参数均是针对特定IP的数据。
+针对每个IP（需要重点关注的IP地址），统计时间窗口大小为15分钟内的数据，获得以上结构化流量特征。
