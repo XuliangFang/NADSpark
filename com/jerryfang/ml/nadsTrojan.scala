@@ -34,7 +34,7 @@ object nadsTrojan {
         var clusterIndex:Int = 0
         val clusters:KMeansModel = Kmeans.train(parsedTrainingData, numClusters, numIterations, runTimes)
 
-        println("How many clusters? Clusters Number: "+ clusters.clusterCenters.lenght)
+        println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
         clusters.clusterCenters.foreach(x => {
             println("Center Point of Cluster " + clusterIndex + ":")
             println(x)
