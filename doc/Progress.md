@@ -86,8 +86,8 @@ Link: https://github.com/ShengjieLuo/DBNS
 
 > Note: 21:35 self-evaluation
 
-* task1:
-* task2:
-* task3:
-* task4:
+* task1: FINISHED
+* task2: Worked but not finished.
+* task3: NO
+* task4: NO
 
