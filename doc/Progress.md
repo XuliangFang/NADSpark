@@ -55,3 +55,39 @@ return op(...op(op(z, x_1), x_2), ..., x_n)
 * 撰写算法原理与数据源需求文档，详细介绍K-Means聚类与Spark MLlib中相关的算法支持。
 * 编译、打包nadsTrojan.scala，测试程序功能。
 * 思考数据源问题的解决方法。
+
+#### April 3rd, 2017
+
+##### Today's work arrangements
+
+> sorted by priority as follows
+
+* Docs & Slides 
+* Test nadsTrojan.scala
+* thinking of final year project Mid-term Check...
+* Think about Thesis of Final Year Project...
+
+Not Good Today...read some code of Shengjie's work. Distributed rules engine.
+
+Link: https://github.com/ShengjieLuo/DBNS
+
+#### April 4th, 2017
+
+##### Today's work arrangements
+
+> MUST FINISH THESE WORK TODAY
+
+* 完成技术文档(.docx)，介绍当前常用木马检测方法以及机器学习聚类算法，然后描述聚类算法检测木马的原理。
+* 完善代码，思考数据源问题解决方法，与学长讨论方法。
+* 初步Slides for group meeting
+* 毕业设计文档准备
+
+##### 今日工作完成情况
+
+> Note: 21:35 self-evaluation
+
+* task1:
+* task2:
+* task3:
+* task4:
+
