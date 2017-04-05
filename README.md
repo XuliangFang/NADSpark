@@ -24,7 +24,7 @@ K值的选取：通过实验确定（10-100, 考察准确率与误报率）
 
 ### Implementation in Scala
 
-A example of using MLlib (K-Means)
+An example of using MLlib (K-Means)
 
 ```scala
 import org.apache.spark.{SparkConf, SparkContext}
