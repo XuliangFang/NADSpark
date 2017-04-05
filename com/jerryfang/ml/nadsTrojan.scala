@@ -32,7 +32,7 @@ object nadsTrojan {
         val numIterations = args(3).toInt
         val runTimes = args(4).toInt
         var clusterIndex:Int = 0
-        val clusters:KMeansModel = Kmeans.train(parsedTrainingData, numClusters, numIterations, runTimes)
+        val clusters:KMeansModel = KMeans.train(parsedTrainingData, numClusters, numIterations, runTimes)
 
         println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
         clusters.clusterCenters.foreach(x => {
@@ -46,8 +46,11 @@ object nadsTrojan {
         val parsedTestData = rawTestData.map(line => {
             Vectors.dense(line.split("\t").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
         })
+
         //Maybe need modification here
-        val testDataSize = parsedTestData.collect().count()
+        val testDataSize = parsedTestData.count()
+        //val testDataSize = rawTestData.collect().count()
+
         parsedTestData.collect().foreach(testDataLine => {
             val predictionClusterIndex: Int = clusters.predict(testDataLine)
             println("The point "+ testDataLine.toString + "belongs to cluser " + predictionClusterIndex)
@@ -75,17 +78,17 @@ object nadsTrojan {
         })*/
         val clusterLabelCount = clusterLabel.map({
             case (clusterPredict, data) =>
-            val mapData: Map[Int, Int] = new Map[Int, Int]
-            mapData.put(clusterPredict, 1))
+            val mapData: Map[Int, Int] = new HashMap[Int, Int]
+            mapData.put(clusterPredict, 1)
             mapData
         }).reduce((a, b) => {
-            b.keySet().toArray().map{
+            b.keys.map{
                 case key:(Int)=>
-                if(a.containsKey(key)){
-                    a.put(key, a.get(key)+b.get(key))
+                if(a.contains(key)){
+                    a.put(key, a.apply(key)+b.apply(key))
                 }
                 else{
-                    a.put(key, b.get(key))
+                    a.put(key, b.apply(key))
                 }
             }
             a
@@ -116,7 +119,7 @@ object nadsTrojan {
 
         println("Begin to optimize K-means model by choosing a K value that takes minimum cost.")
 
-        val ks:Array[Int] = (3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
+        val ks:Array[Int] = Array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
         ks.foreach(clusterNum => {
             val model:KMeansModel = KMeans.train(parsedTrainingData, clusterNum, 30, 1)
             val cost = model.computeCost(parsedTrainingData)

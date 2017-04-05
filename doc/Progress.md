@@ -91,3 +91,11 @@ Link: https://github.com/ShengjieLuo/DBNS
 * task3: NO
 * task4: NO
 
+#### April 5th, 2017
+
+##### Today's work arrangements
+
+* review code
+* 思考木马的下一步
+* 数据源！！！
+* 抓紧测试代码，考虑系统的实现
