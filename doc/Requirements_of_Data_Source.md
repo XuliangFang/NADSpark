@@ -10,7 +10,7 @@ k-means 算法接受输入量 k ；然后将n个数据对象划分为 k个聚类
 
 #### Feature Selection
 
-* **TCP会话时间长度 (Session Duration)**:  时间窗口内，第一个IP-pair session会话长度（从SYN到FIN）。P.S. 如果不好做，这项可以去掉。
+* **TCP会话时间长度 (Session Duration)**:  时间窗口内，第一个IP-pair session会话长度（从SYN到FIN）
 * **DNS行为** **(DNS behavior)**: 时间窗口内，请求DNS次数
 * **上下行包比例 (number of packages)**: 时间窗口内，IP->out包个数除以IP<-out包个数
 * **上下行字节比例(Bytes of packages)**: 时间窗口内，IP->out字节数除以IP<-out字节数

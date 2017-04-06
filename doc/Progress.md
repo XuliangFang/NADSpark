@@ -105,3 +105,17 @@ Link: https://github.com/ShengjieLuo/DBNS
 * code review完成，代码测试完成，但功能测试未完成（数据源问题未解决）。
 * 与金人杰讨论了数据源的问题，需要宇飞帮忙。
 * 木马的下一步：测试完成后，需要考虑从Flow层面检测网络异常。
+
+#### April 6th, 2017
+
+##### Work Arrangements
+
+> Sorted by priority
+
+* 组会Slides：介绍木马检测的方案及数据源要求；基于罗盛杰架构的规则、服务；介绍下周工作（除了木马检测的数据和测试外，其他异常的检测对策以及可视化）
+* 数据源问题解决方案（Depicted in Work.1）
+* ShengjieLuo的代码，架构以及Drools
+* Thinking of 毕设系统（哪些异常的检测？）展示方案
+
+##### 收获
+
