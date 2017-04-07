@@ -119,3 +119,13 @@ Link: https://github.com/ShengjieLuo/DBNS
 
 ##### 收获
 
+#### April 7th, 2017
+
+##### GroupMeeting
+
+> Records
+
+* 整理数据，尽快做出demo
+* 考虑其他异常的检测与毕设系统展示
+* 中期检查的要求
+* 论文——
