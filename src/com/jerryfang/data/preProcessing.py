@@ -12,7 +12,7 @@ def processData(arg1, arg2):
     newFile = open(arg2, 'w')
     with open(rawFile) as file:
         for line in file:
-            if line.find("up") != -1 and line.find("down") != -1:
+            if(line.find("up") != -1 and line.find("down") != -1):
                 newFile.write(line)
     file.close()
     newFile.close()
