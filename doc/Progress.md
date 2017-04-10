@@ -129,3 +129,27 @@ Link: https://github.com/ShengjieLuo/DBNS
 * 考虑其他异常的检测与毕设系统展示
 * 中期检查的要求
 * 论文——
+
+#### April 10th, 2017    Monday
+
+##### Project overview
+
+目前，“基于大数据的网络异常分析”项目工作完成度不高，后期主要工作还有平台迁移，环境安装，代码测试与文档撰写。
+
+##### Work on this week 
+
+> sort by priority
+
+**No.1 木马检测的数据源问题，代码的优化测试、完善**
+
+**No.2 研究Hogzilla的flow实现 & Review code of DBNS** 
+
+**No.3 考虑DDoS攻击、DNS攻击、BotNet、Combination with Distributed Rules Engine**
+
+**No.4 论文应于5月初开始撰写**
+
+##### Today's Work Arrangements
+
+* 阅读Hogzilla源码，DBNS源码
+* 进一步学习Spark平台技术（Hive/SparkSQL/Scala/Others）
+* 编写代码（DDoS攻击、DNS攻击）
