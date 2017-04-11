@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 # pre processing data set
 # function: filter records(up & down)
-# usage: python preProcessing.py filepath
 import os
 import sys
 import string
@@ -16,41 +15,70 @@ def processData(arg1, arg2):
                 #newFile.write(line)
                 # DNS behavior
                 print line
+                firstSpaceIndex = line.find(' ')
+                #print "IP address: " + line[0 : firstSpaceIndex]
+                #newFile.write(line[0:firstSpaceIndex]+" ")
                 dnsNum = 0
                 dnsIndex = line.find("dns")
                 if(dnsIndex!= -1):
                     newFile.write(line[dnsIndex+4: line.find(' ', dnsIndex+4, len(line))]+" ")
-                    print "Expected DNS number: " + line[dnsIndex+4: line.find(' ', dnsIndex+4, len(line))]
+                    print "DNS number: " + line[dnsIndex+4: line.find(' ', dnsIndex+4, len(line))]
                 else:
                     newFile.write("0 ")
-                    print "Expected DNS number: 0"
+                    print "DNS number: 0"
 
                 #Ratio of upload package number/download package number
                 upIndex = line.find("up")+3
-                print "upload package number: " + line[upIndex: line.find(' ', upIndex, len(line))]
+                uploadNum = int(line[upIndex: line.find(' ', upIndex, len(line))])
+                #print "upload package number: " + line[upIndex: line.find(' ', upIndex, len(line))]
+                #print "upload package number: "+ str(uploadNum)
                 downIndex = line.find("down")+5
-                print "download package number: " + line[downIndex: line.find(' ', downIndex, len(line))]
-                ratio = 0.0
+                downloadNum = int(line[downIndex: line.find(' ', downIndex, len(line))])
+                #print "download package number: " + line[downIndex: line.find(' ', downIndex, len(line))]
+                #print "download package number: "+ str(downloadNum)
+                ratioNum = 1.0 * uploadNum / downloadNum
+                print "upload number / download number = " + str(ratioNum)
+                newFile.write(str(ratioNum) + " ")
 
                 #Ratio of upload package size/download package size
                 upsizeIndex = line.find(' ', upIndex, len(line))+1
-                print "upload package size: " + line[upsizeIndex : line.find(' ', upsizeIndex, len(line))]
+                uploadSize = int(line[upsizeIndex : line.find(' ', upsizeIndex, len(line))])
+                #print "upload package size: " + line[upsizeIndex : line.find(' ', upsizeIndex, len(line))]
                 downsizeIndex = line.find(' ', downIndex, len(line))+1
-                print "download package size: " + line[downsizeIndex : line.find(' ', downsizeIndex, len(line))]
+                downloadSize = int(line[downsizeIndex : line.find(' ', downsizeIndex, len(line))])
+                #print "download package size: " + line[downsizeIndex : line.find(' ', downsizeIndex, len(line))]
+                ratioSize = 1.0 * uploadSize / downloadSize
+                print "uploadSize/downloadSize = " + str(ratioSize)
+                newFile.write(str(ratioSize) + " ")
 
                 #Proportion of SYN packages
                 synIndex = line.find("syn")+4
-                print "IP->OUT syn package number: " + line[synIndex : line.find(" ", synIndex, len(line))]
+                synNum = int(line[synIndex : line.find(" ", synIndex, len(line))])
+                #print "IP->OUT syn package number: " + line[synIndex : line.find(" ", synIndex, len(line))]
+                ratioSyn = 1.0 * synNum / uploadNum
+                print "synNum/uploadNum = " + str(ratioSyn)
+                newFile.write(str(ratioSyn) + " ")
 
                 #Proportion of PSH packages
                 pshIndex = line.find("psh")+4
-                print "IP<-IP psh package number: " + line[pshIndex : line.find(" ", pshIndex, len(line))]
+                pshNum = int(line[pshIndex : line.find(" ", pshIndex, len(line))])
+                #print "IP<-IP psh package number: " + line[pshIndex : line.find(" ", pshIndex, len(line))]
+                ratioPsh = 1.0 * pshNum / downloadNum
+                print "pshNum/downloadNum = " + str(ratioPsh)
+                newFile.write(str(ratioPsh) + " ")
 
                 #Proportion of small packages
                 smlIndex1 = line.find("small")+6
-                print "small package number1: " + line[smlIndex1 : line.find(" ", smlIndex1, len(line))]
+                smlNum1 = int(line[smlIndex1 : line.find(" ", smlIndex1, len(line))])
+                #print "small package number1: " + line[smlIndex1 : line.find(" ", smlIndex1, len(line))]
                 smlIndex2 = line.find("small", smlIndex1+1, len(line))+6
-                print "small package number2: " + line[smlIndex2 : line.find(" ", smlIndex2, len(line))]
+                smlNum2 = int(line[smlIndex2 : line.find(" ", smlIndex2, len(line))])
+                #print "small package number2: " + line[smlIndex2 : line.find(" ", smlIndex2, len(line))]
+                smlNum = smlNum1 + smlNum2
+                ratioSml = 1.0 * smlNum / (uploadNum + downloadNum)
+                print "smallNum/packagesNum = " + str(ratioSml)
+                newFile.write(str(ratioSml))
+
                 newFile.write('\n')
 
     file.close()
@@ -58,4 +86,4 @@ def processData(arg1, arg2):
     return
 
 if __name__=='__main__':
-    processData('/home/jerry/NADSpark/data/result.txt', '/home/jerry/NADSpark/data/dataSet.txt')
+    processData('/home/hadoop/trojanData/result.txt', '/home/hadoop/trojanData/trainSet.txt')
