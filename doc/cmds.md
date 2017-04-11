@@ -16,9 +16,9 @@ $ spark-submit --class "nadsTrojan" ./trojan-kmeans_2.11-1.0.jar /tcpheader/trai
 
 ```
 
-#### Others
+#### Scala
 
 ```shell
-
+$ sbt package
 ```
 

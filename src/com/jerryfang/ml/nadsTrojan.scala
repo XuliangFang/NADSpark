@@ -127,8 +127,17 @@ object nadsTrojan {
             println("Got anomalous clusters...---------->>>>>>>>")
             anomalousArray.map({
                 clt => 
-                println("=======================================")
                 println("The index of anomalous cluster is " + clt.toString)
+                println("The points in this cluster are as follows: ")
+                clusterLabel.foreach({
+                    case (pred, data) => {
+                        if(pred == clt)
+                        {
+                            println(data)
+                        }
+                    }
+                })
+                println("=======================================")
             })
         }
         
