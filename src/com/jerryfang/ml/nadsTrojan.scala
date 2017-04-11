@@ -24,7 +24,7 @@ object nadsTrojan {
         //get raw training data
         val rawTrainingData = sc.textFile(args(0))
         val parsedTrainingData = rawTrainingData.filter(!isColumnNameLine(_)).map(line => {
-            Vectors.dense(line.split("\t").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
+            Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
         }).cache()
 
         //cluster the data into classes using Kmeans 
@@ -34,17 +34,19 @@ object nadsTrojan {
         var clusterIndex:Int = 0
         val clusters:KMeansModel = KMeans.train(parsedTrainingData, numClusters, numIterations, runTimes)
 
+        /*
         println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
         clusters.clusterCenters.foreach(x => {
             println("Center Point of Cluster " + clusterIndex + ":")
             println(x)
             clusterIndex += 1
-        })
+        })*/
+
 
         //predict which cluster each point in test data set belongs to
         val rawTestData = sc.textFile(args(1))
         val parsedTestData = rawTestData.map(line => {
-            Vectors.dense(line.split("\t").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
+            Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
         })
 
         //Maybe need modification here
@@ -94,15 +96,29 @@ object nadsTrojan {
             a
         })
         //compute proportion of every cluster
-        val maxAnomalousClusterProportion = 0.05
+        val maxAnomalousClusterProportion = 0.005
         val minDirtyProportion = 0.001
         val threshold = maxAnomalousClusterProportion * testDataSize
+        println("The threshold is " + threshold)
+
+        clusterLabelCount.map({ t =>
+            println("Cluster:"+ t._1 + " Number:" + t._2)
+        })
 
         println("Selecting anomalous cluster...")
 
         val anomalousArray = clusterLabelCount.filter({
             kv => kv._2.toDouble < threshold    
         }).map(_._1)
+
+        //show results
+
+        println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
+        clusters.clusterCenters.foreach(x => {
+            println("Center Point of Cluster " + clusterIndex + ":")
+            println(x)
+            clusterIndex += 1
+        })
 
         if(anomalousArray.isEmpty){
             println("There is no anomalous cluster...")
@@ -116,7 +132,7 @@ object nadsTrojan {
             })
         }
         
-
+        /*
         println("Begin to optimize K-means model by choosing a K value that takes minimum cost.")
 
         val ks:Array[Int] = Array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
@@ -125,6 +141,7 @@ object nadsTrojan {
             val cost = model.computeCost(parsedTrainingData)
             println("Sum of squared distances of points to their nearest center when K=" + clusterNum + " --->>> " + cost)
         })
+        */
     }
 
     private def isColumnNameLine(line:String):Boolean = {

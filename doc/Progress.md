@@ -173,6 +173,96 @@ Link: https://github.com/ShengjieLuo/DBNS
 ##### Today's work
 
 * processData.py, 得到统计数据
+
 * 测试得到聚类结果
+
+  ```shell
+  #when k=2
+  How many clusters? Clusters Number: 2
+  Center Point of Cluster 0:
+  [8.713611696473528,3.6201762799550132,8.047831717687123,0.2509824209559019,1.0,0.7422143969675418]
+  Center Point of Cluster 1:
+  [77690.0,84168.0181818,1398423.62123,0.99946881141,1.0,1.53371052532E-5]
+  #when k=4
+  How many clusters? Clusters Number: 4
+  Center Point of Cluster 0:
+  [3.0460462513987316,3.6202481006706315,8.048165156842792,0.2509675008644095,1.0,0.7422330293087946]
+  Center Point of Cluster 1:
+  [77690.0,84168.0181818,1398423.62123,0.99946881141,1.0,1.53371052532E-5]
+  Center Point of Cluster 2:
+  [167053.0,1.25210084034,1.19340262088,0.590604026846,1.0,0.182835820896]
+  Center Point of Cluster 3:
+  [88157.8,2.553380659281,2.267114526237,0.5030642221058,1.0,0.454463656992]
+  ```
+
 * 合理展示聚类结果
+
+  ```shell
+  The threshold is 536.235
+  Selecting anomalous cluster...
+  Cluster:2 Number:1
+  Cluster:1 Number:1
+  Cluster:3 Number:5
+  How many clusters? Clusters Number: 4
+  Center Point of Cluster 0:
+  [3.0460462513987316,3.6202481006706315,8.048165156842792,0.2509675008644095,1.0,0.7422330293087946]
+  Center Point of Cluster 1:
+  [77690.0,84168.0181818,1398423.62123,0.99946881141,1.0,1.53371052532E-5]
+  Center Point of Cluster 2:
+  [167053.0,1.25210084034,1.19340262088,0.590604026846,1.0,0.182835820896]
+  Center Point of Cluster 3:
+  [88157.8,2.553380659281,2.267114526237,0.5030642221058,1.0,0.454463656992]
+  Got anomalous clusters...---------->>>>>>>>
+  =======================================
+  The index of anomalous cluster is 2
+  =======================================
+  The index of anomalous cluster is 1
+  =======================================
+  The index of anomalous cluster is 3
+  ```
+
+  ```
+  The threshold is 536.235
+  Selecting anomalous cluster...
+  Cluster:2 Number:2
+  Cluster:5 Number:1
+  Cluster:4 Number:3
+  Cluster:7 Number:10
+  Cluster:1 Number:1
+  Cluster:3 Number:2
+  Cluster:6 Number:1
+  How many clusters? Clusters Number: 8
+  Center Point of Cluster 0:
+  [2.6885858972087253,3.4186631900510625,5.915501870962927,0.2509974893184599,1.0,0.7423186994505182]
+  Center Point of Cluster 1:
+  [77690.0,84168.0181818,1398423.62123,0.99946881141,1.0,1.53371052532E-5]
+  Center Point of Cluster 2:
+  [70524.0,0.5620078120075,0.509714296379,0.37705667276050003,1.0,0.6245875121319999]
+  Center Point of Cluster 3:
+  [0.0,2443.214285715,50647.82709995,1.038062074965E-4,1.0,7.813799059054999E-4]
+  Center Point of Cluster 4:
+  [99913.66666666666,3.880962557463333,3.4387146794756664,0.5870692550026666,1.0,0.34104775356533334]
+  Center Point of Cluster 5:
+  [167053.0,1.25210084034,1.19340262088,0.590604026846,1.0,0.182835820896]
+  Center Point of Cluster 6:
+  [38369.0,0.954158302147,0.0888580369825,0.0397530693172,1.0,0.335750914202]
+  Center Point of Cluster 7:
+  [0.0,1677.5025706581,12748.796924414,7.044867047482931E-4,1.0,0.012556342043293001]
+  Got anomalous clusters...---------->>>>>>>>
+  =======================================
+  The index of anomalous cluster is 2
+  =======================================
+  The index of anomalous cluster is 5
+  =======================================
+  The index of anomalous cluster is 4
+  =======================================
+  The index of anomalous cluster is 7
+  =======================================
+  The index of anomalous cluster is 1
+  =======================================
+  The index of anomalous cluster is 3
+  =======================================
+  The index of anomalous cluster is 6
+  ```
+
 * hogzilla结构，思考系统架构
