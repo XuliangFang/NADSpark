@@ -266,3 +266,14 @@ Link: https://github.com/ShengjieLuo/DBNS
   ```
 
 * hogzilla结构，思考系统架构
+
+##### 收获
+
+* scala中map与foreach操作选择
+* scala Vectors.dense()
+* 测试代码
+
+##### 问题
+
+* 直观展示IP地址或者输出数据向量到文件中再做进一步处理
+* 系统架构尚待思考

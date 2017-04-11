@@ -7,6 +7,7 @@ import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.rdd.RDD
+//import java.io.PrintWriter
 
 object nadsTrojan {
     
@@ -27,6 +28,13 @@ object nadsTrojan {
             Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
         }).cache()
 
+        //get IP + IP's Data file
+        val rawFullData = sc.textFile(args(1))
+        /*val parsedFullData = rawFullData.map(line => {
+            Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_))
+        })
+        parsedFullData.foreach(line => println(line._1))*/
+
         //cluster the data into classes using Kmeans 
         val numClusters = args(2).toInt
         val numIterations = args(3).toInt
@@ -44,10 +52,11 @@ object nadsTrojan {
 
 
         //predict which cluster each point in test data set belongs to
-        val rawTestData = sc.textFile(args(1))
+        val rawTestData = sc.textFile(args(0))
         val parsedTestData = rawTestData.map(line => {
             Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
         })
+
 
         //Maybe need modification here
         val testDataSize = parsedTestData.count()
@@ -124,6 +133,7 @@ object nadsTrojan {
             println("There is no anomalous cluster...")
         }
         else{
+
             println("Got anomalous clusters...---------->>>>>>>>")
             anomalousArray.map({
                 clt => 
