@@ -30,10 +30,19 @@ object nadsTrojan {
 
         //get IP + IP's Data file
         val rawFullData = sc.textFile(args(1))
-        /*val parsedFullData = rawFullData.map(line => {
-            Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_))
+        val parsedFullData = rawFullData.map(line => {
+            line.split(" ").map(_.trim).filter(!"".equals(_))
         })
-        parsedFullData.foreach(line => println(line._1))*/
+        //parsedFullData.foreach(line => println("[debug] " + line.mkString(" ")))
+        val fullData = parsedFullData.map(line => {
+            //val ipAddr = line(0)
+            //println("[debug] " + line(0) + "Number of dot: " + dotNumber(line(0)))
+            val linebuff = line.toBuffer
+            linebuff.remove(0)
+            val linearr = linebuff.toArray.map(_.toDouble)
+            val vecData = Vectors.dense(linearr)
+            (line(0), vecData)
+        })
 
         //cluster the data into classes using Kmeans 
         val numClusters = args(2).toInt
@@ -72,10 +81,18 @@ object nadsTrojan {
         println("--------------------------------------->>>>>>>>>>>>>")
         println("Simple Prediction finished.")
 
+/*
         //labeling and raise event(normal or abnormal)
         val clusterLabel = parsedTestData.map(data => {
             val clusterPredict = clusters.predict(data)
             (clusterPredict, data)
+        })
+*/
+        //new labeling 2017-4-12 P.M.
+        val newClusterLabel = fullData.map({
+            case (ipAddr, data) =>
+            val clusterPrediction = clusters.predict(data)
+            (clusterPrediction, ipAddr, data)
         })
 
         //statistic
@@ -87,8 +104,8 @@ object nadsTrojan {
         }).reduceByKey((a, b) => {
             b._2
         })*/
-        val clusterLabelCount = clusterLabel.map({
-            case (clusterPredict, data) =>
+        val clusterLabelCount = newClusterLabel.map({
+            case (clusterPredict, ipAddr, data) =>
             val mapData: Map[Int, Int] = new HashMap[Int, Int]
             mapData.put(clusterPredict, 1)
             mapData
@@ -108,13 +125,13 @@ object nadsTrojan {
         val maxAnomalousClusterProportion = 0.005
         val minDirtyProportion = 0.001
         val threshold = maxAnomalousClusterProportion * testDataSize
-        println("The threshold is " + threshold)
+        println("[debug] The threshold is " + threshold)
 
         clusterLabelCount.map({ t =>
-            println("Cluster:"+ t._1 + " Number:" + t._2)
+            println("[debug] Cluster:"+ t._1 + " Number:" + t._2)
         })
 
-        println("Selecting anomalous cluster...")
+        println("[debug] Selecting anomalous cluster...")
 
         val anomalousArray = clusterLabelCount.filter({
             kv => kv._2.toDouble < threshold    
@@ -122,32 +139,31 @@ object nadsTrojan {
 
         //show results
 
-        println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
+        println("[debug] How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
         clusters.clusterCenters.foreach(x => {
-            println("Center Point of Cluster " + clusterIndex + ":")
-            println(x)
+            println("[debug] Center Point of Cluster " + clusterIndex + ":")
+            println("[debug] "+ x)
             clusterIndex += 1
         })
 
         if(anomalousArray.isEmpty){
-            println("There is no anomalous cluster...")
+            println("[debug] There is no anomalous cluster...")
         }
         else{
-
-            println("Got anomalous clusters...---------->>>>>>>>")
+            println("[debug] Got anomalous clusters...---------->>>>>>>>")
             anomalousArray.map({
                 clt => 
-                println("The index of anomalous cluster is " + clt.toString)
-                println("The points in this cluster are as follows: ")
-                clusterLabel.foreach({
-                    case (pred, data) => {
+                println("[debug] The index of anomalous cluster is " + clt.toString)
+                println("[debug] The points in this cluster are as follows: ")
+                newClusterLabel.foreach({
+                    case (pred, ip, data) => {
                         if(pred == clt)
                         {
-                            println(data)
+                            println("[debug] In cluster "+ clt + ": " + ip + " " +data)
                         }
                     }
                 })
-                println("=======================================")
+                println("[debug] =======================================")
             })
         }
         
@@ -166,5 +182,14 @@ object nadsTrojan {
     private def isColumnNameLine(line:String):Boolean = {
         if(line != null && line.contains("dns")) true
         else false
+    }
+
+    private def dotNumber(line:String):Int = {
+        var cnt:Int = 0
+        line.foreach( ch => 
+            if(ch == '.')
+                cnt += 1
+        )
+        cnt
     }
 }

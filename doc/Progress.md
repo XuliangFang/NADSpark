@@ -321,3 +321,18 @@ def create_label_point(line:String):LabeledPoint = {
   }
 ```
 
+Problem：java.lang.NumberFormatException: multiple points 非线程安全？
+
+Solution：println("[debug] " + line(0) + "Number of dot: " + dotNumber(line(0)))
+
+```scala
+        val linebuff = line.toBuffer
+        linebuff.remove(0)
+        val linearr = linebuff.toArray.map(_.toDouble) --错写成--> val linearr = line.toArray.map(...)
+        val vecData = Vectors.dense(linearr)
+        (line(0), vecData)
+```
+##### 评价
+
+* 完成了完整的展示功能，下一步将检测结果写入数据库，展示到前端
+* ​
