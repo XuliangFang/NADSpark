@@ -255,6 +255,8 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] =======================================
 ```
 
+##### k=6, iterationNum=100, runtimes=3
+
 ```shell
 u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2.11-1.0.jar /tcpheader/trainSet.txt /tcpheader/dataSet.txt 6 100 3 2>&1 | grep "debug"
 [debug] The threshold is 536.235
@@ -307,6 +309,5 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] In cluster 3: 202.119.25.74 [0.0,2719.42857143,56915.8978289,1.05064089094E-4,1.0,0.00105025468676]
 [debug] =======================================
 [debug] [Info] There are 11 anomalous IPs among 5 clusters.
-
 ```
 

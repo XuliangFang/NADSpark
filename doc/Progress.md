@@ -335,4 +335,5 @@ Solution：println("[debug] " + line(0) + "Number of dot: " + dotNumber(line(0))
 ##### 评价
 
 * 完成了完整的展示功能，下一步将检测结果写入数据库，展示到前端
-* ​
+* Read Guidance to SparkSQL, DataFrames and DataSets
+* 明天可以玩玩Hive与SparkSQL，以及构建一个小型的Flask应用*。
