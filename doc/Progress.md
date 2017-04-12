@@ -277,3 +277,47 @@ Link: https://github.com/ShengjieLuo/DBNS
 
 * 直观展示IP地址或者输出数据向量到文件中再做进一步处理
 * 系统架构尚待思考
+
+#### April 12th, 2017
+
+> Wednesday
+
+##### TODO Arrangements
+
+* 完善测试代码的展示部分，准备测试报告for group meeting slides
+* 参考hogzilla的架构，构建系统架构
+* 考虑从flow的角度，选取参量维度，实现其他情况的检测
+* 阅读ShengjieLuo/DBNS的源码，进一步熟悉分布式规则引擎的架构
+
+##### Work
+
+```scala
+//scala grammar
+//To print a 1-D and 2-D Array
+scala> val a = Array.range(1,10)  
+a: Array[Int] = Array(1, 2, 3, 4, 5, 6, 7, 8, 9)  
+scala> println(a.mkString(" "))  
+1 2 3 4 5 6 7 8 9  
+scala> val array = Array.fill(2,2)(0)
+array: Array[Array[Int]] = Array(Array(0, 0), Array(0, 0))
+scala> println(array.deep.mkString("\n"))
+Array(0, 0)
+Array(0, 0)
+
+//得到带标签的向量
+def create_label_point(line:String):LabeledPoint = {
+    //字符串去空格，以逗号分隔转为数组
+    val linearr = line.trim().split(" ")
+    val linedoublearr = linearr.map(x=>x.toDouble)
+    //定长数组转可变数组
+    val linearrbuff = linedoublearr.toBuffer
+    //移除label元素（将linedoublearr的第一个元素作为标签）
+    linearrbuff.remove(0)
+    //将剩下的元素转为向量
+    val vectorarr = linearrbuff.toArray
+    val vector = Vectors.dense(vectorarr)
+    //返回标签向量
+    LabeledPoint(linedoublearr(0),vector)
+  }
+```
+
