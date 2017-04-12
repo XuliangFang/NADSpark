@@ -130,6 +130,9 @@ object nadsTrojan {
         clusterLabelCount.map({ t =>
             println("[debug] Cluster:"+ t._1 + " Number:" + t._2)
         })
+        val anomalyIpCount = clusterLabelCount.filter({
+                kv => kv._2.toDouble < threshold
+            }).reduce((x, y) => (x._1, x._2+y._2))
 
         println("[debug] Selecting anomalous cluster...")
 
@@ -151,6 +154,8 @@ object nadsTrojan {
         }
         else{
             println("[debug] Got anomalous clusters...---------->>>>>>>>")
+            println("[debug] =======================================")
+            var anomalyClusterCount = 0
             anomalousArray.map({
                 clt => 
                 println("[debug] The index of anomalous cluster is " + clt.toString)
@@ -164,7 +169,9 @@ object nadsTrojan {
                     }
                 })
                 println("[debug] =======================================")
+                anomalyClusterCount += 1
             })
+            println("[debug] [Info] There are " + anomalyIpCount._2 + " anomalous IPs among " + anomalyClusterCount + " clusters.")
         }
         
         /*

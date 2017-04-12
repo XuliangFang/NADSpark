@@ -253,6 +253,60 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] In cluster 6: 180.153.93.66 [0.0,464.0,16578.96875,0.00431034482759,1.0,0.00430107526882]
 [debug] In cluster 6: 101.4.56.88 [0.0,6250.0,13220.6344569,2.63529411765E-4,1.0,0.00987136175859]
 [debug] =======================================
+```
+
+```shell
+u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2.11-1.0.jar /tcpheader/trainSet.txt /tcpheader/dataSet.txt 6 100 3 2>&1 | grep "debug"
+[debug] The threshold is 536.235
+[debug] Cluster:2 Number:3
+[debug] Cluster:5 Number:1
+[debug] Cluster:4 Number:3
+[debug] Cluster:1 Number:1
+[debug] Cluster:3 Number:3
+[debug] Cluster:0 Number:107236
+[debug] Selecting anomalous cluster...
+[debug] How many clusters? Clusters Number: 6
+[debug] Center Point of Cluster 0:
+[debug] [2.688360252154127,3.567899059888344,6.871488661956645,0.25097648869805605,1.0,0.742257557176031]
+[debug] Center Point of Cluster 1:
+[debug] [77690.0,84168.0181818,1398423.62123,0.99946881141,1.0,1.53371052532E-5]
+[debug] Center Point of Cluster 2:
+[debug] [59805.666666666664,0.692724642054,0.3694288765801666,0.26462213827939995,1.0,0.5283086461553332]
+[debug] Center Point of Cluster 3:
+[debug] [0.0,1875.7428571433334,42071.39480273333,9.920173852299998E-5,1.0,9.702773561603333E-4]
+[debug] Center Point of Cluster 4:
+[debug] [99913.66666666666,3.880962557463333,3.4387146794756664,0.5870692550026666,1.0,0.34104775356533334]
+[debug] Center Point of Cluster 5:
+[debug] [167053.0,1.25210084034,1.19340262088,0.590604026846,1.0,0.182835820896]
+[debug] Got anomalous clusters...---------->>>>>>>>
+[debug] =======================================
+[debug] The index of anomalous cluster is 2
+[debug] The points in this cluster are as follows: 
+[debug] In cluster 2: 202.121.64.130 [38369.0,0.954158302147,0.0888580369825,0.0397530693172,1.0,0.335750914202]
+[debug] In cluster 2: 202.121.244.201 [65657.0,0.637529137529,0.569460871648,0.254113345521,1.0,0.6128113879]
+[debug] In cluster 2: 202.121.64.5 [75391.0,0.486486486486,0.44996772111,0.5,1.0,0.636363636364]
+[debug] =======================================
+[debug] The index of anomalous cluster is 5
+[debug] The points in this cluster are as follows: 
+[debug] In cluster 5: 202.121.209.11 [167053.0,1.25210084034,1.19340262088,0.590604026846,1.0,0.182835820896]
+[debug] =======================================
+[debug] The index of anomalous cluster is 4
+[debug] The points in this cluster are as follows: 
+[debug] In cluster 4: 202.121.244.200 [97841.0,0.544809228039,0.437771447757,0.42671009772,1.0,0.604824813326]
+[debug] In cluster 4: 210.35.96.2 [95608.0,10.2487961477,8.7403233709,0.888018794049,1.0,0.122716894977]
+[debug] In cluster 4: 210.35.96.6 [106292.0,0.849282296651,1.13804921977,0.446478873239,1.0,0.295601552393]
+[debug] =======================================
+[debug] The index of anomalous cluster is 1
+[debug] The points in this cluster are as follows: 
+[debug] In cluster 1: 202.121.66.133 [77690.0,84168.0181818,1398423.62123,0.99946881141,1.0,1.53371052532E-5]
+[debug] =======================================
+[debug] The index of anomalous cluster is 3
+[debug] The points in this cluster are as follows: 
+[debug] In cluster 3: 58.205.220.24 [0.0,740.8,24918.5302083,8.9992800576E-5,1.0,0.00134807225667]
+[debug] In cluster 3: 2.17.49.71 [0.0,2167.0,44379.756371,1.02548325899E-4,1.0,5.12505125051E-4]
+[debug] In cluster 3: 202.119.25.74 [0.0,2719.42857143,56915.8978289,1.05064089094E-4,1.0,0.00105025468676]
+[debug] =======================================
+[debug] [Info] There are 11 anomalous IPs among 5 clusters.
 
 ```
 
