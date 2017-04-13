@@ -311,7 +311,15 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] [Info] There are 11 anomalous IPs among 5 clusters.
 ```
 
+###### General Procedure
+
 ![FrameWork](../pics/FrameWork.png)
+
+###### 数据字段如下：
+
+| IP地址        | DNS次数 | 上下行包数比例 | 上下行字节比例 | SYN包占比 | PSH包占比 |
+| ----------- | ----- | ------- | ------- | ------ | ------ |
+| 106.75.76.5 | 0     | 0.2647  | 0.7799  | 0      | 1.0    |
 
 ##### k=8, iterationNum=100, runtimes=5
 
