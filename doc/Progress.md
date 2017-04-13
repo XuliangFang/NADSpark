@@ -1,6 +1,6 @@
 ## Progress Records
 
-Project Link: https://github.com/XuliangFang/NADSpark
+**Project Link:** https://github.com/XuliangFang/NADSpark
 
 #### March 29th, 2017
 
@@ -337,3 +337,16 @@ Solution：println("[debug] " + line(0) + "Number of dot: " + dotNumber(line(0))
 * 完成了完整的展示功能，下一步将检测结果写入数据库，展示到前端
 * Read Guidance to SparkSQL, DataFrames and DataSets
 * 明天可以玩玩Hive与SparkSQL，以及构建一个小型的Flask应用*。
+
+#### April 13th, 2017 Thursday 
+
+##### TODO Arrangements
+
+昨天完成了完整信息的展示，今天要做的主要是考虑将检测结果写入数据库，更重要的是，除了木马的检测，其他网络异常的检测方法（DDoS，DNS相关攻击，参见http://ids-hogzilla.org/）。确定好做哪些攻击检测以后，检测方法-->>分布式规则引擎的Service服务（参见DBNS https://github.com/ShengjieLuo/DBNS/tree/cluster）。实现攻击检测的后台算法与前端展示。 
+
+> Sorted by priority
+
+* HBase, Hive, SparkSQL, DataFrames.
+* 检测哪些攻击？方法？参量维度？
+* 进一步测试，形成组会Slides（回顾方法、参量，测试数据，测试参数与结果，下一步工作）
+* 若有时间，了解DBNS的最新进展情况
