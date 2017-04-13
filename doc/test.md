@@ -311,6 +311,6 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] [Info] There are 11 anomalous IPs among 5 clusters.
 ```
 
-![FrameWork](..\pics\FrameWork.png)
+![FrameWork](../pics/FrameWork.png)
 
 Just for test.
