@@ -44,6 +44,36 @@ object nadsTrojan {
             (line(0), vecData)
         })
 
+        //Normalize data 
+        //This part is added on Firday 14th April 2017
+        println("[debug] Calculating some variables to normalize data...")
+        val n = parsedTrainingData.count()
+        val numCols = parsedTrainingData.first.length
+        val sums = parsedTrainingData.reduce((a,b) => a.zip(b).map(t => t._1 + t._2))
+        val sumSquares = parsedTrainingData.fold(
+            new Array[Double](numCols)
+        )(
+            (a,b) => a.zip(b).map(t => t._1 + t._2*t._2)
+        )
+              
+        val stdevs = sumSquares.zip(sums).map{
+            case(sumSq,sum) => math.sqrt(n*sumSq - sum*sum)/n
+        }
+            
+        val means = sums.map(_/n)
+              
+        def normalize(vector: Vector):Vector = {
+            val normArray = (vector.toArray, means, stdevs).zipped.map(
+                (value,mean,std) =>
+                  if(std<=0) (value-mean) else (value-mean)/std)
+            return Vectors.dense(normArray)
+        }   
+
+        println("[debug] Normalizing data...")
+        val labelAndData = fullData.map( (ip, vecData) => 
+            (ip, normalize(vecData))
+        )
+
         //cluster the data into classes using Kmeans 
         val numClusters = args(2).toInt
         val numIterations = args(3).toInt
