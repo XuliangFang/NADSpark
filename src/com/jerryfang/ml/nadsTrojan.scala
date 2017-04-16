@@ -6,6 +6,7 @@ import scala.collection.mutable.HashSet
 import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 //import java.io.PrintWriter
 
@@ -47,10 +48,13 @@ object nadsTrojan {
         //Normalize data 
         //This part is added on Firday 14th April 2017
         println("[debug] Calculating some variables to normalize data...")
-        val n = parsedTrainingData.count()
-        val numCols = parsedTrainingData.first.length
-        val sums = parsedTrainingData.reduce((a,b) => a.zip(b).map(t => t._1 + t._2))
-        val sumSquares = parsedTrainingData.fold(
+        val arrayParsedTrainingData = rawTrainingData.filter(!isColumnNameLine(_)).map(line => {
+            line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble)
+        })
+        val n = arrayParsedTrainingData.count()
+        val numCols = arrayParsedTrainingData.first.length
+        val sums = arrayParsedTrainingData.reduce((a,b) => a.zip(b).map(t => t._1 + t._2))
+        val sumSquares = arrayParsedTrainingData.fold(
             new Array[Double](numCols)
         )(
             (a,b) => a.zip(b).map(t => t._1 + t._2*t._2)
@@ -70,16 +74,20 @@ object nadsTrojan {
         }   
 
         println("[debug] Normalizing data...")
-        val labelAndData = fullData.map( (ip, vecData) => 
+        val labelAndData = fullData.map({ 
+            case (ip, vecData) => 
             (ip, normalize(vecData))
-        )
+        })
+        println("[debug] Morlization Finished!")
+
+        val trainData = labelAndData.values.cache()
 
         //cluster the data into classes using Kmeans 
         val numClusters = args(2).toInt
         val numIterations = args(3).toInt
         val runTimes = args(4).toInt
         var clusterIndex:Int = 0
-        val clusters:KMeansModel = KMeans.train(parsedTrainingData, numClusters, numIterations, runTimes)
+        val clusters:KMeansModel = KMeans.train(trainData, numClusters, numIterations, runTimes)
 
         /*
         println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
@@ -91,6 +99,7 @@ object nadsTrojan {
 
 
         //predict which cluster each point in test data set belongs to
+        /***********
         val rawTestData = sc.textFile(args(0))
         val parsedTestData = rawTestData.map(line => {
             Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
@@ -110,6 +119,7 @@ object nadsTrojan {
         println("--------------------------------------->>>>>>>>>>>>>")
         println("--------------------------------------->>>>>>>>>>>>>")
         println("Simple Prediction finished.")
+        ***********/
 
 /*
         //labeling and raise event(normal or abnormal)
@@ -119,7 +129,7 @@ object nadsTrojan {
         })
 */
         //new labeling 2017-4-12 P.M.
-        val newClusterLabel = fullData.map({
+        val newClusterLabel = labelAndData.map({
             case (ipAddr, data) =>
             val clusterPrediction = clusters.predict(data)
             (clusterPrediction, ipAddr, data)
@@ -152,22 +162,29 @@ object nadsTrojan {
             a
         })
         //compute proportion of every cluster
-        val maxAnomalousClusterProportion = 0.005
+        val maxAnomalousClusterProportion = 0.01
         val minDirtyProportion = 0.001
+        //test data size
+        val testDataSize = labelAndData.count()
         val threshold = maxAnomalousClusterProportion * testDataSize
+        val minProportion = minDirtyProportion * testDataSize
         println("[debug] The threshold is " + threshold)
 
         clusterLabelCount.map({ t =>
             println("[debug] Cluster:"+ t._1 + " Number:" + t._2)
         })
-        val anomalyIpCount = clusterLabelCount.filter({
-                kv => kv._2.toDouble < threshold
-            }).reduce((x, y) => (x._1, x._2+y._2))
+        val anomalyIpNumberPair = clusterLabelCount.filter({
+                kv => (kv._2.toDouble < threshold && kv._2.toDouble > minProportion)
+        })
+        var anomalyIpCount = 0
+        if(!anomalyIpNumberPair.isEmpty){
+            anomalyIpCount = anomalyIpNumberPair.reduce((x, y) => (x._1, x._2+y._2))._2
+        }
 
         println("[debug] Selecting anomalous cluster...")
 
         val anomalousArray = clusterLabelCount.filter({
-            kv => kv._2.toDouble < threshold    
+            kv => (kv._2.toDouble < threshold  && kv._2.toDouble > minProportion)  
         }).map(_._1)
 
         //show results
@@ -201,19 +218,19 @@ object nadsTrojan {
                 println("[debug] =======================================")
                 anomalyClusterCount += 1
             })
-            println("[debug] [Info] There are " + anomalyIpCount._2 + " anomalous IPs among " + anomalyClusterCount + " clusters.")
+            println("[debug] [Info] There are " + anomalyIpCount + " anomalous IPs among " + anomalyClusterCount + " clusters.")
         }
         
-        /*
-        println("Begin to optimize K-means model by choosing a K value that takes minimum cost.")
+        
+        println("[debug] Begin to optimize K-means model by choosing a K value that takes minimum cost.")
 
-        val ks:Array[Int] = Array(3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20)
+        val ks:Array[Int] = Array(8,9,10,11,12,13,14,15,16,17,18,19,20)
         ks.foreach(clusterNum => {
-            val model:KMeansModel = KMeans.train(parsedTrainingData, clusterNum, 30, 1)
-            val cost = model.computeCost(parsedTrainingData)
-            println("Sum of squared distances of points to their nearest center when K=" + clusterNum + " --->>> " + cost)
+            val model:KMeansModel = KMeans.train(trainData, clusterNum, 50, 1)
+            val cost = model.computeCost(trainData)
+            println("[debug] Sum of squared distances of points to their nearest center when K=" + clusterNum + " --->>> " + cost)
         })
-        */
+        
     }
 
     private def isColumnNameLine(line:String):Boolean = {

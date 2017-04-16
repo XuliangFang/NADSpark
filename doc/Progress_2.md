@@ -30,5 +30,23 @@
 
 ![z-score_normalization](../pics/z-score_normalization.gif)
 
+#### April 17th, 2017 Monday
 
+##### Backview & New week arrangments
+
+上周完成了归一化和寻找合适K值（通过计算cost的方式）的代码。昨天拿到了另外两个特征的数据，今天可以在新数据集下完成测试，希望能有更好的效果。
+
+本周任务较重，大部分时间应该花在设计和开发上。
+
+* 完成一或两种新攻击（异常）的检测
+* 分布式规则引擎的框架（思考论文是否可用）
+* 准备开始撰写论文
+
+##### Today's work arrangements
+
+* 新数据集的处理，处理逻辑优化
+* 仔细检查，归一化的过程是否可以再完善
+* 测试代码，完善一下代码（周末完成的代码）
+* New Attacks的检测方法（数据要求参考hogzilla）
+* hogzilla & DBNS
 

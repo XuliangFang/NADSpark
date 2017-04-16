@@ -11,13 +11,28 @@ def processData(arg1, arg2):
     newFile = open(arg2, 'w')
     with open(rawFile) as file:
         for line in file:
-            if (line.find("up") != -1 and line.find("down") != -1):
+            if (line.find("up") != -1 and line.find("down") != -1 and line.find("com") != -1):
                 #newFile.write(line)
                 # DNS behavior
                 print line
+
+                # Mean interval time and session duaration
+                comIndex1 = line.find("com")+4
+                times = int(line[comIndex1 : line.find(" ", comIndex1, len(line))])
+                if(times==0):
+                    continue
+                # ip addr
                 firstSpaceIndex = line.find(' ')
-                #print "IP address: " + line[0 : firstSpaceIndex]
+                print "IP address: " + line[0 : firstSpaceIndex]
                 #newFile.write(line[0:firstSpaceIndex]+" ")
+
+                comIndex2 = line.find(" ", comIndex1, len(line))+1
+                duaration = int(line[comIndex2 : line.find(" ", comIndex2, len(line))])
+                newFile.write(str(1.0 * duaration / times) + " ")
+                #print "[debug] times= " + line[comIndex1 : line.find(" ", comIndex1, len(line))]
+                #print "[debug] session time= " + line[comIndex2 : line.find(" ", comIndex2, len(line))]
+
+                # dns 
                 dnsNum = 0
                 dnsIndex = line.find("dns")
                 if(dnsIndex!= -1):
@@ -27,7 +42,7 @@ def processData(arg1, arg2):
                     newFile.write("0 ")
                     print "DNS number: 0"
 
-                #Ratio of upload package number/download package number
+                # Ratio of upload package number/download package number
                 upIndex = line.find("up")+3
                 uploadNum = int(line[upIndex: line.find(' ', upIndex, len(line))])
                 #print "upload package number: " + line[upIndex: line.find(' ', upIndex, len(line))]
@@ -40,7 +55,7 @@ def processData(arg1, arg2):
                 print "upload number / download number = " + str(ratioNum)
                 newFile.write(str(ratioNum) + " ")
 
-                #Ratio of upload package size/download package size
+                # Ratio of upload package size/download package size
                 upsizeIndex = line.find(' ', upIndex, len(line))+1
                 uploadSize = int(line[upsizeIndex : line.find(' ', upsizeIndex, len(line))])
                 #print "upload package size: " + line[upsizeIndex : line.find(' ', upsizeIndex, len(line))]
@@ -51,7 +66,7 @@ def processData(arg1, arg2):
                 print "uploadSize/downloadSize = " + str(ratioSize)
                 newFile.write(str(ratioSize) + " ")
 
-                #Proportion of SYN packages
+                # Proportion of SYN packages
                 synIndex = line.find("syn")+4
                 synNum = int(line[synIndex : line.find(" ", synIndex, len(line))])
                 #print "IP->OUT syn package number: " + line[synIndex : line.find(" ", synIndex, len(line))]
@@ -59,7 +74,7 @@ def processData(arg1, arg2):
                 print "synNum/uploadNum = " + str(ratioSyn)
                 newFile.write(str(ratioSyn) + " ")
 
-                #Proportion of PSH packages
+                # Proportion of PSH packages
                 pshIndex = line.find("psh")+4
                 pshNum = int(line[pshIndex : line.find(" ", pshIndex, len(line))])
                 #print "IP<-IP psh package number: " + line[pshIndex : line.find(" ", pshIndex, len(line))]
@@ -67,7 +82,7 @@ def processData(arg1, arg2):
                 print "pshNum/downloadNum = " + str(ratioPsh)
                 newFile.write(str(ratioPsh) + " ")
 
-                #Proportion of small packages
+                # Proportion of small packages
                 smlIndex1 = line.find("small")+6
                 smlNum1 = int(line[smlIndex1 : line.find(" ", smlIndex1, len(line))])
                 #print "small package number1: " + line[smlIndex1 : line.find(" ", smlIndex1, len(line))]
@@ -86,4 +101,4 @@ def processData(arg1, arg2):
     return
 
 if __name__=='__main__':
-    processData('/home/hadoop/trojanData/result.txt', '/home/hadoop/trojanData/trainSet.txt')
+    processData('/home/hadoop/trojanData/rawdata_v2.txt', '/home/hadoop/trojanData/normalizeDataSet_v2.txt')
