@@ -59,3 +59,6 @@
 * 新的异常类型检测（port scan, DoS(UDP amplification), DNS tunel etc.）数据要求
 * 与人杰讨论将异常检测结果放到前端
 * Save model for ShengjieLuo
+
+![k-cost](../pics/k-cost.png)
+
