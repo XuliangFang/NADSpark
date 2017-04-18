@@ -4,6 +4,7 @@ import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.HashSet
 import org.apache.spark.{SparkContext, SparkConf}
+//import org.apache.spark.mllib.clustering.ClusteringSummary
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
@@ -78,8 +79,16 @@ object nadsTrojan {
             case (ip, vecData) => 
             (ip, normalize(vecData))
         })
+
+        //for display raw data in anomalous clusters 
+        val ipRawNorData = fullData.map({
+            case (ip, vecData) =>
+            (ip, vecData, normalize(vecData))
+        })
+
         println("[debug] Morlization Finished!")
 
+        //get training data for K-Means algorithm
         val trainData = labelAndData.values.cache()
 
         //cluster the data into classes using Kmeans 
@@ -88,6 +97,9 @@ object nadsTrojan {
         val runTimes = args(4).toInt
         var clusterIndex:Int = 0
         val clusters:KMeansModel = KMeans.train(trainData, numClusters, numIterations, runTimes)
+        //added on 18th April
+        //val clustersSummaryCol = clusters.summary.featuresCol
+        //println("[debug] ------------------ $clustersSummaryCol" + "------------------>>>>>>>>>>> "+ clustersSummaryCol)
 
         /*
         println("How many clusters? Clusters Number: "+ clusters.clusterCenters.length)
@@ -133,6 +145,13 @@ object nadsTrojan {
             case (ipAddr, data) =>
             val clusterPrediction = clusters.predict(data)
             (clusterPrediction, ipAddr, data)
+        })
+
+        //for display
+        val displayClusterLabel = ipRawNorData.map({
+            case (ipaddr, rawdata, normaldata) =>
+            val clusterPredict = clusters.predict(normaldata)
+            (clusterPredict, ipaddr, rawdata)
         })
 
         //statistic
@@ -207,11 +226,25 @@ object nadsTrojan {
                 clt => 
                 println("[debug] The index of anomalous cluster is " + clt.toString)
                 println("[debug] The points in this cluster are as follows: ")
-                newClusterLabel.foreach({
+                displayClusterLabel.foreach({
                     case (pred, ip, data) => {
                         if(pred == clt)
                         {
-                            println("[debug] In cluster "+ clt + ": " + ip + " " +data)
+                            //剔除DNS行为数为0的记录
+                            if(data.apply(1) != 0.0)
+                            {
+                                println("[debug] In cluster "+ clt + ": " + ip)
+                                println("[debug] ******* Details ******* (data -->> means)")
+                                var tmpCount:Int = 1
+                                val featuresArray = Array("IntervalTime", "DNS", "Up/Down Packages Number", "Up/Down Packages Size", "SYN proportion", "PSH proportion", "Small Packages proportion")
+                                means.foreach({t => 
+                                    println("[debug] " + featuresArray(tmpCount-1) + "\t " + data.apply(tmpCount-1) + "\t-->>\t"+t)
+                                    tmpCount += 1
+                                })
+                                println("[debug] ")
+                            }
+                            //println("[debug] Mean data: "+ means)
+                            //println("[debug] In cluster "+ clt + ": " + ip + " " +data)
                         }
                     }
                 })

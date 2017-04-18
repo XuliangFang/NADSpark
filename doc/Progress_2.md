@@ -50,3 +50,12 @@
 * New Attacks的检测方法（数据要求参考hogzilla）
 * hogzilla & DBNS
 
+#### April 18th, 2017 Tuesday
+
+##### Work Arrangements
+
+* 进一步标注结果，翻译被标准化的数据
+* 试一试Max-Min标准化数据后的测试效果
+* 新的异常类型检测（port scan, DoS(UDP amplification), DNS tunel etc.）数据要求
+* 与人杰讨论将异常检测结果放到前端
+* Save model for ShengjieLuo
