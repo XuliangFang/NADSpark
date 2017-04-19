@@ -56,9 +56,21 @@
 
 * 进一步标注结果，翻译被标准化的数据
 * 试一试Max-Min标准化数据后的测试效果
-* 新的异常类型检测（port scan, DoS(UDP amplification), DNS tunel etc.）数据要求
+* 新的异常类型检测（port scan, DoS(UDP amplification), DNS tunnel etc.）数据要求
 * 与人杰讨论将异常检测结果放到前端
 * Save model for ShengjieLuo
 
 ![k-cost](../pics/k-cost.png)
+
+##### Self-rate
+
+* 没有尝试新的标准化方法
+
+* 新的异常类型：DDoS、ICMP Tunnel、Portscan
+
+* 离线分析结果写入MySQL(.12)表中
+
+* SaveModel
+
+  > *clusters.save(sc, "target/org/apache/spark/KMeansExample/KMeansModel")*
 
