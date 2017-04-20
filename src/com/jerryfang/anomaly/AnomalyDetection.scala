@@ -278,17 +278,17 @@ object AnomalyDetection {
           {false}
         }
     })
-  .map({case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,sampleRate)) =>
+    .map({case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,sampleRate)) =>
            (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,1L,sampleRate))
-  })
-  .reduceByKey({
+    })
+    .reduceByKey({
     case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,numberOfflowsA,pairsA,sampleRateA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,numberOfflowsB,pairsB,sampleRateB)) =>
       (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, numberOfflowsA+numberOfflowsB,pairsA+pairsB,(sampleRateA+sampleRateB)/2)
-  })
-  .filter{case  (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,pairs,sampleRate)) => 
+    })
+    .filter{case  (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,pairs,sampleRate)) => 
                 pairs > ddosMinPairsThreshold 
          }
-  .foreach{case  (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,pairs,sampleRate)) => 
+    .foreach{case  (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,pairs,sampleRate)) => 
     
               
                             println("MyIP: "+myIP+ " - DDoS Attack: "+numberOfflows+" Pairs: "+pairs.toString)
@@ -417,6 +417,109 @@ object AnomalyDetection {
                     
                     populateAbusedSMTP(event).alert()
     }
+
+/*
+ * 
+ * Vertical PortScans
+ * 
+ * 
+ */
+//val vPortScanMinPortsThreshold = 3
+  
+    
+  println("")
+  println("Vertical portscan")
+ 
+    val vPortScanCollection: PairRDDFunctions[(String,String), (Long,Long,Long,HashSet[(String,String,String,String,String,Long,Long,Long,Int,Long,Long,Long,Int)],Long,Long)] = 
+    sflowSummary
+    .filter({case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,direction,beginTime,endTime,sampleRate,status)) 
+                  => alienPort.toLong < vPortScanPortIntervalThreshold  &
+                     myPort.toLong > 1023 &
+                     numberPkts < 5 // few pkts per flow
+           })
+    .map({
+      case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,direction,beginTime,endTime,sampleRate,status)) =>
+         val flowSet:HashSet[(String,String,String,String,String,Long,Long,Long,Int,Long,Long,Long,Int)] = new HashSet()
+         flowSet.add((myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,direction,beginTime,endTime,sampleRate,status))
+        ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,1L,sampleRate))
+        })
+  
+    val vPortScanCollectionFinal=
+    vPortScanCollection
+    .reduceByKey({
+    case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,numberOfflowsA,sampleRateA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,numberOfflowsB,sampleRateB)) =>
+      (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, numberOfflowsA+numberOfflowsB, (sampleRateA+sampleRateB)/2)
+    })
+    .map({case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,sampleRate)) =>
+        
+        ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,
+            flowSet
+            .map({ case (myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,direction,beginTime,endTime,sampleRate,status) => alienPort})
+            .toArray
+            .distinct
+            .size,
+          sampleRate))
+      })
+    .cache
+  
+    val vPortScanStats = 
+    vPortScanCollectionFinal
+    .map({case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numPorts,sampleRate)) =>
+        numPorts
+    }).stats()
+  
+  
+    vPortScanCollectionFinal
+    .filter({case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numPorts,sampleRate)) =>
+        numPorts > vPortScanMinPortsThreshold
+    })
+    .filter{case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numPorts,sampleRate)) =>
+                   !p2pTalkers.contains(myIP)// Avoid P2P talkers
+           }
+    .foreach{case  ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numPorts,sampleRate)) => 
+    
+                    val savedHistogram=HogHBaseHistogram.getHistogram("HIST08-"+myIP)
+                    
+                    val histogram = new HashMap[String,Double]
+                    val key = numPorts.toString
+                    histogram.put(key, 1D)
+                    
+                    if(savedHistogram.histSize< 10)
+                    {
+                      HogHBaseHistogram.saveHistogram(Histograms.merge(savedHistogram, new HogHistogram("",1L,histogram)))
+                    }else
+                    {
+
+                          if(savedHistogram
+                              .histMap
+                              .filter({case (numberOfPorts,weight) =>
+                                            numberOfPorts.toLong >= numPorts &
+                                            weight > Histograms.atypicalThreshold
+                                }).size  == 0
+                            )
+                          {
+                            println("MyIP: "+myIP+ "  (N:1,S:"+savedHistogram.histSize+") - Vertical PortScan: "+numberOfflows+" numPorts: "+numPorts.toString)
+                            
+                            val flowMap: Map[String,String] = new HashMap[String,String]
+                            flowMap.put("flow:id",System.currentTimeMillis.toString)
+                            val event = new HogEvent(new HogFlow(flowMap,myIP,alienIP))
+                            event.data.put("numberOfFlows",numberOfflows.toString)
+                            event.data.put("numberOfPorts",numPorts.toString)
+                            event.data.put("myIP", myIP)
+                            event.data.put("alienIP", alienIP)
+                            event.data.put("bytesUp",   (bytesUp*sampleRate).toString)
+                            event.data.put("bytesDown", (bytesDown*sampleRate).toString)
+                            event.data.put("numberPkts", numberPkts.toString)
+                            event.data.put("stringFlows", setFlows2String(flowSet))
+                            event.data.put("portsMean", vPortScanStats.mean.round.toString)
+                            event.data.put("portsStdev", vPortScanStats.stdev.round.toString)
+                            
+                            populateVerticalPortScan(event).alert()
+                          }
+                          
+                          HogHBaseHistogram.saveHistogram(Histograms.merge(savedHistogram, new HogHistogram("",1L,histogram)))
+                    }
+            }
 
 /*
   * 
