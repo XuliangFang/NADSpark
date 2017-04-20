@@ -88,3 +88,14 @@
 * saved model "/tcpheader/KmeansModel"
 * 不用尝试Min-Max标准化方法，因为在机器学习聚类时，不适合线性标准化，转化后符合正态分布的zscore更适合
 * DDoS/DNS Tunnel/Portscan/Hosts connecting to botnets, executing port scans or running worms
+
+#### April 20th, 2017 Thursday
+
+##### Work Arrangements Today
+
+* 新的异常类型检测逻辑&code
+* 定义table字段，写入离线分析结果到MySQL
+* PPT 介绍情况
+
+##### Self-Rate
+
