@@ -5,7 +5,8 @@
 $ hdfs dfs -put <localfile> <hdfs path>
 #list file
 $ hdfs dfs -ls [hdfspath]
-
+#download file
+$ hdfs dfs -get /tcpheader/KmeansModel ./getModel
 ```
 
 #### Spark
