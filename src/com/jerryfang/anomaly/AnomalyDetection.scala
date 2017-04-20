@@ -49,7 +49,7 @@ object AnomalyDetection {
     val ddosExceptionAlienPorts:Set[String] = Set("80","443","587","465","993","995")
     val FlowListLimit = 1000
 
-    def populateAlienAccessingManyHosts(event:HogEvent):HogEvent =
+    def populateAlienAccessingManyHosts(event:NadsEvent):NadsEvent =
     {
         val numberOfPairs:String = event.data.get("numberOfPairs")
         val alienIP:String = event.data.get("alienIP")
@@ -63,7 +63,7 @@ object AnomalyDetection {
         
         event.ports = "Ports: "+ports
         
-        event.text = "This IP was detected by Hogzilla performing an abnormal activity. In what follows, you can see more information.\n"+
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
                       "Abnormal behaviour: Alien accessing too much hosts ("+numberOfPairs+"). Possibly a horizontal port scan.\n"+
                       "AlienIP: "+alienIP+"\n"+
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
@@ -76,7 +76,7 @@ object AnomalyDetection {
         event
     }
 
-    def populateUDPAmplifier(event:HogEvent):HogEvent =
+    def populateUDPAmplifier(event:NadsEvent):NadsEvent =
     {
         val hostname:String = event.data.get("hostname")
         val bytesUp:String = event.data.get("bytesUp")
@@ -85,7 +85,7 @@ object AnomalyDetection {
         val stringFlows:String = event.data.get("stringFlows")
         val connections:String = event.data.get("connections")
         
-        event.text = "This IP was detected by Hogzilla performing an abnormal activity. In what follows, you can see more information.\n"+
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
                       "Abnormal behaviour: Host is sending too many big UDP packets. May be a DDoS.\n"+
                       "IP: "+hostname+"\n"+
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
@@ -98,7 +98,7 @@ object AnomalyDetection {
         event
     }
 
-    def populateAbusedSMTP(event:HogEvent):HogEvent =
+    def populateAbusedSMTP(event:NadsEvent):NadsEvent =
     {
         val hostname:String = event.data.get("hostname")
         val bytesUp:String = event.data.get("bytesUp")
@@ -107,7 +107,7 @@ object AnomalyDetection {
         val stringFlows:String = event.data.get("stringFlows")
         val connections:String = event.data.get("connections")
         
-        event.text = "This IP was detected by Hogzilla performing an abnormal activity. In what follows, you can see more information.\n"+
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
                       "Abnormal behaviour: Host is receiving too many e-mail submissions. May be an abused SMTP server. \n"+
                       "IP: "+hostname+"\n"+
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
@@ -120,7 +120,7 @@ object AnomalyDetection {
         event
     }
 
-    def populateICMPTunnel(event:HogEvent):HogEvent =
+    def populateICMPTunnel(event:NadsEvent):NadsEvent =
     {
         val hostname:String = event.data.get("hostname")
         val bytesUp:String = event.data.get("bytesUp")
@@ -129,7 +129,7 @@ object AnomalyDetection {
         val stringFlows:String = event.data.get("stringFlows")
         val connections:String = event.data.get("connections")
         
-        event.text = "This IP was detected by Hogzilla performing an abnormal activity. In what follows, you can see more information.\n"+
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
                       "Abnormal behaviour: Host has DNS communication with large amount of data. \n"+
                       "IP: "+hostname+"\n"+
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
@@ -142,7 +142,7 @@ object AnomalyDetection {
         event
     }
 
-    def populateHorizontalPortScan(event:HogEvent):HogEvent =
+    def populateHorizontalPortScan(event:NadsEvent):NadsEvent =
     {
         val numberOfFlows:String = event.data.get("numberOfFlows")
         val numberOfFlowsPerPort:String = event.data.get("numberOfFlowsPerPort")
@@ -161,7 +161,7 @@ object AnomalyDetection {
         event.ports = "Ports: "+ports
 
         
-        event.text = "This IP was detected by Hogzilla performing an abnormal activity. In what follows, you can see more information.\n"+
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
                       "Abnormal behaviour: Horizontal Port Scan \n"+
                       "IP: "+myIP+"\n"+
                       "Number of flows: "+numberOfFlows+"\n"+
@@ -177,7 +177,7 @@ object AnomalyDetection {
         event
     }
 
-    def populateDDoSAttack(event:HogEvent):HogEvent =
+    def populateDDoSAttack(event:NadsEvent):NadsEvent =
     {
         val numberOfFlows:String = event.data.get("numberOfFlows")
         val numberOfAttackers:String = event.data.get("numberOfAttackers")
@@ -190,7 +190,7 @@ object AnomalyDetection {
         val flowsStdev:String = event.data.get("flowsStdev")
         
         
-        event.text = "This IP was detected by Hogzilla performing an abnormal activity. In what follows, you can see more information.\n"+
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
                       "Abnormal behaviour: Host possibly under DDoS attack.\n"+
                       "IP: "+myIP+"\n"+
                       "Number of Attackers: "+numberOfAttackers+"\n"+
@@ -295,7 +295,7 @@ object AnomalyDetection {
                             
                             val flowMap: Map[String,String] = new HashMap[String,String]
                             flowMap.put("flow:id",System.currentTimeMillis.toString)
-                            val event = new HogEvent(new HogFlow(flowMap,myIP,"255.255.255.255"))
+                            val event = new NadsEvent(new HogFlow(flowMap,myIP,"255.255.255.255"))
                             event.data.put("numberOfFlows",numberOfflows.toString)
                             event.data.put("numberOfAttackers",pairs.toString)
                             event.data.put("myIP", myIP)
@@ -351,7 +351,7 @@ object AnomalyDetection {
                     println("("+myIP+","+bytesUp+")" ) 
                     val flowMap: Map[String,String] = new HashMap[String,String]
                     flowMap.put("flow:id",System.currentTimeMillis.toString)
-                    val event = new HogEvent(new HogFlow(flowMap,myIP,"255.255.255.255"))
+                    val event = new NadsEvent(new HogFlow(flowMap,myIP,"255.255.255.255"))
                     
                     event.data.put("hostname", myIP)
                     event.data.put("bytesUp",   (bytesUp*sampleRate).toString)
@@ -406,7 +406,7 @@ object AnomalyDetection {
                     println("("+myIP+","+alienIP+","+bytesUp+")" ) 
                     val flowMap: Map[String,String] = new HashMap[String,String]
                     flowMap.put("flow:id",System.currentTimeMillis.toString)
-                    val event = new HogEvent(new HogFlow(flowMap,myIP,alienIP))
+                    val event = new NadsEvent(new HogFlow(flowMap,myIP,alienIP))
                     
                     event.data.put("hostname", myIP)
                     event.data.put("bytesUp",   (bytesUp*sampleRate).toString)
@@ -531,7 +531,7 @@ object AnomalyDetection {
                         
                         val flowMap: Map[String,String] = new HashMap[String,String]
                         flowMap.put("flow:id",System.currentTimeMillis.toString)
-                        val event = new HogEvent(new HogFlow(flowMap,myIP,"255.255.255.255"))
+                        val event = new NadsEvent(new HogFlow(flowMap,myIP,"255.255.255.255"))
                         event.data.put("numberOfFlows",numberOfflows.toString)
                         event.data.put("numberOfFlowsAlienPort",numberOfPairsPort.toString)
                         event.data.put("numberOfFlowsPerPort",atypical.map({case (port,number) => port+"="+number}).mkString("[",", ","]"))
