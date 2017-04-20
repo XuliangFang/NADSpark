@@ -74,3 +74,17 @@
 
   > *clusters.save(sc, "target/org/apache/spark/KMeansExample/KMeansModel")*
 
+#### April 19th, 2017 Wednesday
+
+##### Work Arrangements Today
+
+* save model
+* 新的标准化方法
+* 新的异常类型code
+* 离线结果写入MySQL，放到前端
+
+##### Self-Rate
+
+* saved model "/tcpheader/KmeansModel"
+* 不用尝试Min-Max标准化方法，因为在机器学习聚类时，不适合线性标准化，转化后符合正态分布的zscore更适合
+* DDoS/DNS Tunnel/Portscan/Hosts connecting to botnets, executing port scans or running worms
