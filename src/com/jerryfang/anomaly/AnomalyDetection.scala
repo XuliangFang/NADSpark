@@ -212,7 +212,7 @@ object AnomalyDetection {
  * 
  */
 
-    
+
   println("")
   println("Server under DDoS attack")
  
@@ -506,24 +506,24 @@ object AnomalyDetection {
                 {
                     val atypical   = histogram.filter({ case (port,numPairsPort) =>
                         
-                                            if(port.equals("25") && Histograms.isTypicalEvent(hogHistogramOpenPorts.histMap, "25"))
-                                            {
-                                                false // Avoid FP with SMTP servers
-                                            }
-                                                
-                                            if(savedHistogram.histMap.get(port).isEmpty)
-                                            {
-                                                true // This MyIP never accessed so much distinct Aliens in the same port
-                                            }
-                                            else{
-                                                if(savedHistogram.histMap.get(port).get.toLong < numPairsPort)
-                                                  true // This MyIP never accessed so much distinct Aliens in the same port
-                                                else
-                                                  false // Is typical
-                                            }
-                                        })
+                        if(port.equals("25") && Histograms.isTypicalEvent(hogHistogramOpenPorts.histMap, "25"))
+                        {
+                            false // Avoid FP with SMTP servers
+                        }
+                            
+                        if(savedHistogram.histMap.get(port).isEmpty)
+                        {
+                            true // This MyIP never accessed so much distinct Aliens in the same port
+                        }
+                        else{
+                            if(savedHistogram.histMap.get(port).get.toLong < numPairsPort)
+                              true // This MyIP never accessed so much distinct Aliens in the same port
+                            else
+                              false // Is typical
+                        }
+                    })
                         
-                       // Histograms.atypical(savedHistogram.histMap, histogram)
+                    // Histograms.atypical(savedHistogram.histMap, histogram)
 
                     if(atypical.size>0)
                     {
@@ -544,17 +544,16 @@ object AnomalyDetection {
                         event.data.put("flowsStdev", hPortScanStats.stdev.round.toString)
                         
                         event.data.put("ports",flowSet
-                                          .map({case (myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,direction,beginTime,endTime,sampleRate,status) =>
-                                                (proto,alienPort)
-                                               }).toArray
-                                               .distinct
-                                               .map({case (proto,alienPort) => proto+"/"+alienPort})
-                                               .mkString(", ")
-                                        )
+                                        .map({case (myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,direction,beginTime,endTime,sampleRate,status) =>
+                                            (proto,alienPort)
+                                        }).toArray
+                                        .distinct
+                                        .map({case (proto,alienPort) => proto+"/"+alienPort})
+                                        .mkString(", ")
+                                    )
                         
                         populateHorizontalPortScan(event).alert()
-                    }
-                      
+                    }  
                     HogHBaseHistogram.saveHistogram(Histograms.mergeMax(savedHistogram, new HogHistogram("",numberOfflows,histogram)))
                 }
         }
