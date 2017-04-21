@@ -657,7 +657,6 @@ object AnomalyDetection {
                         
                         populateHorizontalPortScan(event).alert()
                     }  
-                    HogHBaseHistogram.saveHistogram(Histograms.mergeMax(savedHistogram, new HogHistogram("",numberOfflows,histogram)))
                 }
         }
 
