@@ -1,5 +1,6 @@
 package com.jerryfang.ml
 
+import java.util.Properties
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.Map
 import scala.collection.mutable.HashSet
@@ -9,7 +10,8 @@ import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.
+import org.apache.spark.sql.{SQLContext, Row}
+import org.apache.spark.sql.types.{StringType, IntegerType, StructField, StructType, TimestampType}
 
 
 object nadsTrojan {
@@ -24,6 +26,18 @@ object nadsTrojan {
 
         val conf = new SparkConf().setAppName("K-means Clustering Detect Trojan")
         val sc = new SparkContext(conf)
+        //for writing in database
+        val sqlContext = new sqlContext(sc)
+        val schema = StructType(List(StructField("ipaddr", StringType, true), 
+                                    StructField("intervalTime", StringType, true), 
+                                    StructField("dnsTimes", StringType, true),
+                                    StructField("upDownNumber", StringType, true),
+                                    StructField("upDownSize", StringType, true),
+                                    StructField("synProportion", StringType, true),
+                                    StructField("pshProportion", StringType, true),
+                                    StructField("smallProportion", StringType, true)//,
+                                    //StructField("troTime", TimestampType, true)
+                                    ))
 
         //get raw training data
         val rawTrainingData = sc.textFile(args(0))
@@ -192,13 +206,39 @@ object nadsTrojan {
             println("[debug] Got anomalous clusters...---------->>>>>>>>")
             println("[debug] =======================================")
             var anomalyClusterCount:Int = 0
-            //var meaningfulAnomalyPointsCount:Int = 0
-            //val anomalyDataSet:Set[Vector] = Set()
             anomalousArray.map({
                 clt => 
                 println("[debug] The index of anomalous cluster is " + clt.toString)
                 println("[debug] The points in this cluster are as follows: ")
-                displayClusterLabel.foreach({
+                val trojanRDD = displayClusterLabel
+                .filter({
+                    case(predict, ip, data) => predict==clt & data.apply(1) != 0.0
+                })
+                .map({
+                    case(predict, ip, data) =>
+                    println("[debug] In cluster "+ clt + ": " + ip)
+                    println("[debug] ******* Details ******* (data -->> means)")
+                    var tmpCount:Int = 1
+                    val featuresArray = Array("IntervalTime", "DNS Query Times", "Up/Down Packages Number", "Up/Down Packages Size", "SYN Packages proportion", "PSH Packages proportion", "Small Packages proportion")
+                    means.foreach({t => 
+                        println("[debug] " + featuresArray(tmpCount-1) + "\t " + data.apply(tmpCount-1) + "\t-->>\t"+t)
+                        tmpCount += 1
+                    })
+                    println("[debug] ")
+                    (ip, data)
+                })
+                //木马检测结果写入数据库
+                val rowRDD = trojanRDD.map({ case(ip, p) => Row(ip.trim, p(0).toString.trim, p(1).toString.trim, p(2).toString.trim, p(3).toString.trim,
+                                                    p(4).toString.trim, p(5).toString.trim, p(6).toString.trim )
+                                        })
+                 val trojanDataFrame = sqlContext.createDataFrame(rowRDD, schema)
+                 val prop = new Properties()
+                 prop.put("user", "root")
+                 prop.put("password", "hadoop928")
+                 prop.put("driver", "com.mysql.jdbc.Driver")
+                 trojanDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.trojan", prop)
+
+                /*displayClusterLabel.foreach({
                     case (pred, ip, data) => {
                         if(pred == clt)
                         {
@@ -220,7 +260,7 @@ object nadsTrojan {
                             //println("[debug] In cluster "+ clt + ": " + ip + " " +data)
                         }
                     }
-                })
+                })*/
                 println("[debug] =======================================")
                 anomalyClusterCount += 1
             })

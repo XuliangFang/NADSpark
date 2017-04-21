@@ -39,13 +39,15 @@ mysql> use anomaly
 Database changed
 mysql> create table trojan(
     -> id int(4) primary key not null auto_increment,
+    -> ipaddr varchar(16),
     -> intervalTime varchar(16),
     -> dnsTimes varchar(16),
     -> upDownNumber varchar(16),
     -> upDownSize varchar(16),
     -> synProportion varchar(16),
     -> pshProportion varchar(16),
-    -> smallProportion varchar(16)
+    -> smallProportion varchar(16),
+    -> troTime datetime,
     -> );
 Query OK, 0 rows affected (0.72 sec)
 
