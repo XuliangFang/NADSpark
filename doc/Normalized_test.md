@@ -313,6 +313,331 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 
 ```
 
+**k=4, proportion=0.05, **
+
+```shell
+u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2.11-1.0.jar /tcpheader/normalizeDataSet_v2.txt /tcpheader/trainSet_v2.txt 4 100 5 0.05 2>&1 | grep "debug"
+[debug] Calculating some variables to normalize data...
+[debug] Normalizing data...
+[debug] Morlization Finished!
+[debug] The threshold is 1061.9
+[debug] Cluster:2 Number:10521
+[debug] Cluster:1 Number:624
+[debug] Cluster:3 Number:2023
+[debug] Cluster:0 Number:8070
+[debug] Selecting anomalous cluster...
+[debug] How many clusters? Clusters Number: 4
+[debug] Center Point of Cluster 0:
+[debug] [-5.113249187809294E-6,-5.313057567224868E-8,-7.107058456424575E-7,-9.376674580625146E-9,0.004222780537757839,0.0,0.0036113713968711873]
+[debug] Center Point of Cluster 1:
+[debug] [2.3627515111992174E-5,1.2737653257993241E-6,2.321109684490624E-6,-7.804673709360071E-9,0.11148874170819693,0.0,0.004180316750373432]
+[debug] Center Point of Cluster 2:
+[debug] [-9.678160150680458E-6,-5.1778984904924855E-8,2.235750421230059E-7,9.198905839471351E-9,-0.01850155406769818,0.0,-0.004719916870586817]
+[debug] Center Point of Cluster 3:
+[debug] [6.246923022060349E-5,8.633664670956198E-8,9.337469811346069E-7,-8.029522650482654E-9,0.04438842521784186,0.0,0.008769019378378916]
+[debug] Got anomalous clusters...---------->>>>>>>>
+[debug] =======================================
+[debug] The index of anomalous cluster is 1
+[debug] The points in this cluster are as follows: 
+[debug] In cluster 1: 202.121.66.126
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 16.2916666667	-->>	7.760409190141052
+[debug] DNS Query Times	 123.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 80.6583333333	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 11.7782664895	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.98532906292	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.0164302479845	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.165.200
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.0	-->>	7.760409190141052
+[debug] DNS Query Times	 2.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 14.3	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 16.2851592852	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.90472027972	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.932189542484	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 210.35.96.2
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.0	-->>	7.760409190141052
+[debug] DNS Query Times	 67676.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 12.6536697248	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 11.3335707314	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.934384629328	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.0940702166975	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 210.35.96.6
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 9.0	-->>	7.760409190141052
+[debug] DNS Query Times	 217851.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 1.16920152091	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 1.15260305055	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.839024390244	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.245398773006	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 198.20.69.98
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 12.0	-->>	7.760409190141052
+[debug] DNS Query Times	 4.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 16.8571428571	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 22.8926007731	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.848516949153	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.867	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.158.166
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.833333333333	-->>	7.760409190141052
+[debug] DNS Query Times	 7.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 17.5063291139	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 22.8577586207	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.877078814172	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.919972640219	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.167.142
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.0	-->>	7.760409190141052
+[debug] DNS Query Times	 3.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 17.0714285714	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 21.967920354	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.846025104603	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.891699604743	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 94.102.49.190
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 7.0	-->>	7.760409190141052
+[debug] DNS Query Times	 4.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 16.7755102041	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 19.9746514575	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.841849148418	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.888633754305	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 94.102.49.193
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 3.85714285714	-->>	7.760409190141052
+[debug] DNS Query Times	 4.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 14.0357142857	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 18.4917127072	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.872773536896	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.884798099762	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 93.174.95.106
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 21.3	-->>	7.760409190141052
+[debug] DNS Query Times	 18.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 14.3666666667	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 17.1362383741	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.92343387471	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.930585683297	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 80.82.77.139
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.2	-->>	7.760409190141052
+[debug] DNS Query Times	 25.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 16.0319148936	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 18.9940495868	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.897146648971	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.928794503435	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.135.131
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.833333333333	-->>	7.760409190141052
+[debug] DNS Query Times	 8.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 20.0144927536	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 24.4615902965	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.922519913106	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.92275862069	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 66.240.219.146
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.833333333333	-->>	7.760409190141052
+[debug] DNS Query Times	 3.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 16.125	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 20.6940681924	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.869186046512	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.874087591241	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 202.121.209.11
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.0	-->>	7.760409190141052
+[debug] DNS Query Times	 111766.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 3.56056338028	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 3.31199973095	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.973892405063	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.0512662137122	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 89.248.172.16
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.2	-->>	7.760409190141052
+[debug] DNS Query Times	 3.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 15.775	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 19.8727695888	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.876386687797	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.912071535022	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.146.130
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.0	-->>	7.760409190141052
+[debug] DNS Query Times	 4.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 12.7837837838	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 14.8287269682	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.915433403805	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.935294117647	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 80.82.77.33
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.2	-->>	7.760409190141052
+[debug] DNS Query Times	 27.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 18.7723577236	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 21.5502188716	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.914248592464	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.939555921053	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 202.121.244.200
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.0	-->>	7.760409190141052
+[debug] DNS Query Times	 67715.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 0.874484384207	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 0.82115841526	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.685983827493	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.834014460861	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.146.185
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 5.0	-->>	7.760409190141052
+[debug] DNS Query Times	 7.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 13.4361702128	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 17.1892515661	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.89469517023	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.920412675018	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 66.240.192.138
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 2.5	-->>	7.760409190141052
+[debug] DNS Query Times	 5.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 16.453125	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 19.1769268056	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.893637226971	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.92927484333	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 71.6.146.186
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.833333333333	-->>	7.760409190141052
+[debug] DNS Query Times	 2.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 18.5666666667	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 23.6710526316	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.887791741472	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.904599659284	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 89.248.167.131
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.8	-->>	7.760409190141052
+[debug] DNS Query Times	 19.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 13.2435897436	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 11.6666666667	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.909970958374	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.90099009901	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 210.35.98.140
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.0	-->>	7.760409190141052
+[debug] DNS Query Times	 32.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 2.54330708661	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 0.463200966166	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.665634674923	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.324444444444	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 185.163.109.66
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 1.2	-->>	7.760409190141052
+[debug] DNS Query Times	 1.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 15.5	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 31.5234375	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.838709677419	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.863636363636	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 198.20.69.74
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 9.0	-->>	7.760409190141052
+[debug] DNS Query Times	 6.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 14.2058823529	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 18.943537415	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.836438923395	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.852998065764	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 202.121.66.24
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 4.0	-->>	7.760409190141052
+[debug] DNS Query Times	 27.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 0.973342447027	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 1.13332198587	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.823735955056	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.739868375476	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 223.93.160.71
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 11.5	-->>	7.760409190141052
+[debug] DNS Query Times	 1.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 1.04347826087	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 0.939960629921	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.708333333333	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.468085106383	-->>	0.4035539130826372
+[debug] 
+[debug] In cluster 1: 66.240.236.119
+[debug] ******* Details ******* (data -->> means)
+[debug] IntervalTime	 0.6	-->>	7.760409190141052
+[debug] DNS Query Times	 6.0	-->>	42.29696769940672
+[debug] Up/Down Packages Number	 15.8852459016	-->>	3.7452182364698317
+[debug] Up/Down Packages Size	 17.575	-->>	49.546375466172236
+[debug] SYN Packages proportion	 0.921568627451	-->>	0.17065055011780997
+[debug] PSH Packages proportion	 1.0	-->>	1.0
+[debug] Small Packages proportion	 0.938834951456	-->>	0.4035539130826372
+[debug] 
+[debug] =======================================
+[debug] [Info] There are 624 anomalous IPs among 1 clusters.
+[debug] Begin to optimize K-means model by choosing a K value that takes minimum cost.
+[debug] Sum of squared distances of points to their nearest center when K=8 --->>> 1.5704834325151467
+[debug] Sum of squared distances of points to their nearest center when K=9 --->>> 1.4830114301440762
+[debug] Sum of squared distances of points to their nearest center when K=10 --->>> 1.3344281396676858
+[debug] Sum of squared distances of points to their nearest center when K=11 --->>> 1.1815552292668703
+[debug] Sum of squared distances of points to their nearest center when K=12 --->>> 1.0980180818270295
+[debug] Sum of squared distances of points to their nearest center when K=13 --->>> 1.0025247869555085
+[debug] Sum of squared distances of points to their nearest center when K=14 --->>> 0.9335871384612366
+[debug] Sum of squared distances of points to their nearest center when K=15 --->>> 0.88135774090665
+[debug] Sum of squared distances of points to their nearest center when K=16 --->>> 0.8265689506308564
+[debug] Sum of squared distances of points to their nearest center when K=17 --->>> 0.7435645405128073
+[debug] Sum of squared distances of points to their nearest center when K=18 --->>> 0.712376359617301
+[debug] Sum of squared distances of points to their nearest center when K=19 --->>> 0.6796333100821896
+[debug] Sum of squared distances of points to their nearest center when K=20 --->>> 0.6327520355573425
+
+```
+
 
 
 **k=15, 166 anomalous IPs but only shows meaningful records**

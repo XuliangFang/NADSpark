@@ -99,3 +99,20 @@
 
 ##### Self-Rate
 
+
+
+#### April 21th, 2017 Friday
+
+##### Group meeting
+
+* Shengjie: Data Normalization (Kmeans input)
+* 多个维度训练模型，不简单丢弃数据记录
+* 写入数据库，前端展示目前的训练结果
+* 流式处理的数据准备与逻辑优化（完整代码util、database interface）
+
+##### Work Arrangements
+
+* 将目前的训练结果写入数据库（MySQL）
+* 整理数据要求给金人杰
+* SparkStreaming ??
+* 处理逻辑及代码架构
