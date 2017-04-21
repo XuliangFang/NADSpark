@@ -112,7 +112,7 @@
 
 ##### Work Arrangements
 
-* 将目前的训练结果写入数据库（MySQL）
+* Git创建新分支（withdb），将目前的训练结果写入数据库（MySQL）id,ip,interval time, dns, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion
 * 整理数据要求给金人杰
 * SparkStreaming ??
 * 处理逻辑及代码架构
