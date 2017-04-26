@@ -109,29 +109,51 @@ object ddosDetection extends Any {
     
         println("IP: "+alienIP+ " - DDoS Attack: "+numberFlows+" Pairs: "+pairs.toString)
         
-        val flowMap: Map[String,String] = new HashMap[String,String]
-        flowMap.put("flow:id",System.currentTimeMillis.toString)
-        val event = new nadsEvent(new nadsFlow(flowMap,myIP,"255.255.255.255"))
+        //val flowMap: Map[String,String] = new HashMap[String,String]
+        //flowMap.put("flow:id",System.currentTimeMillis.toString)
+        val event = new nadsEvent()
         event.data.put("numberFlows",numberFlows.toString)
         event.data.put("numberOfAttackers",pairs.toString)
-        event.data.put("under attack IP", alienIP)
+        event.data.put("underAttackIP", alienIP)
         event.data.put("bytesUp",   (bytesUp*sampleRate).toString)
         event.data.put("bytesDown", (bytesDown*sampleRate).toString)
         event.data.put("numberPkts", numberPkts.toString)
-        //here
-        //here
-        //here set flows 2 string need to be implemented
         event.data.put("stringFlows", flowSet2String(flowSet))
         event.data.put("flowsMean", ddosStats.mean.round.toString)
         event.data.put("flowsStdev", ddosStats.stdev.round.toString)
         
-        // TODO: 
+        // DO: (write into database and display on front-end)
         raiseDDoSEvent(event).alert()       
     }
 
-    //Function: Raise DDoS attack events(write into database and display on front-end)
+    //Function: Raise DDoS attack events
     def raiseDDoSEvent(event:nadsEvent):nadsEvent = {
-        
+
+        val numberFlows:String = event.data.get("numberFlows")
+        val numberOfAttackers:String = event.data.get("numberOfAttackers")
+        val alienIP:String = event.data.get("underAttackIP")
+        val bytesUp:String = event.data.get("bytesUp")
+        val bytesDown:String = event.data.get("bytesDown")
+        val numberPkts:String = event.data.get("numberPkts")
+        val stringFlows:String = event.data.get("stringFlows")
+        val flowsMean:String = event.data.get("flowsMean")
+        val flowsStdev:String = event.data.get("flowsStdev")
+
+        event.title = "DDoS Detection Event"
+    
+        event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
+                      "Abnormal behaviour: Host possibly under DDoS attack.\n"+
+                      "IP: "+alienIP+"\n"+
+                      "Number of Attackers: "+numberOfAttackers+"\n"+
+                      "Number of flows: "+numberOfFlows+"\n"+
+                      "Mean/Stddev of flows per AlienIP (all flows for this IP): "+flowsMean+"/"+flowsStdev+"\n"+
+                      "Bytes Up: "+humanBytes(bytesUp)+"\n"+
+                      "Bytes Down: "+humanBytes(bytesDown)+"\n"+
+                      "Packets: "+numberPkts+"\n"+
+                      "Flows"+stringFlows
+                      
+        //event.signature_id = signature._16.signature_id  
+        event
     }
 
     //translate flow set to easy-read string
