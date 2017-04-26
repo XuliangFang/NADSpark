@@ -27,7 +27,7 @@ object nadsTrojan {
         val conf = new SparkConf().setAppName("K-means Clustering Detect Trojan")
         val sc = new SparkContext(conf)
         //for writing in database
-        val sqlContext = new sqlContext(sc)
+        val sqlContext = new SQLContext(sc)
         val schema = StructType(List(StructField("ipaddr", StringType, true), 
                                     StructField("intervalTime", StringType, true), 
                                     StructField("dnsTimes", StringType, true),
@@ -231,12 +231,12 @@ object nadsTrojan {
                 val rowRDD = trojanRDD.map({ case(ip, p) => Row(ip.trim, p(0).toString.trim, p(1).toString.trim, p(2).toString.trim, p(3).toString.trim,
                                                     p(4).toString.trim, p(5).toString.trim, p(6).toString.trim )
                                         })
-                 val trojanDataFrame = sqlContext.createDataFrame(rowRDD, schema)
-                 val prop = new Properties()
-                 prop.put("user", "root")
-                 prop.put("password", "hadoop928")
-                 prop.put("driver", "com.mysql.jdbc.Driver")
-                 trojanDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.trojan", prop)
+                val trojanDataFrame = sqlContext.createDataFrame(rowRDD, schema)
+                val prop = new Properties()
+                prop.put("user", "root")
+                prop.put("password", "hadoop928")
+                prop.put("driver", "com.mysql.jdbc.Driver")
+                trojanDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.trojan", prop)
 
                 /*displayClusterLabel.foreach({
                     case (pred, ip, data) => {

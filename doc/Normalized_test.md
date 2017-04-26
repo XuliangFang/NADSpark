@@ -25,6 +25,14 @@
 
 #### 测试结果
 
+##### k=15, 21 anomalous IPs
+
+```shell
+
+```
+
+
+
 **k=15, 202 anomalous IPs but only shows meaningful records**
 
 ```shell
@@ -310,7 +318,6 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] Sum of squared distances of points to their nearest center when K=18 --->>> 0.6950810283316726
 [debug] Sum of squared distances of points to their nearest center when K=19 --->>> 0.6486530905079353
 [debug] Sum of squared distances of points to their nearest center when K=20 --->>> 0.649752741108198
-
 ```
 
 **k=4, proportion=0.05, **

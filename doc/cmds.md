@@ -12,9 +12,10 @@ $ hdfs dfs -get /tcpheader/KmeansModel ./getModel
 #### Spark
 
 ```shell
+#newest cmds for test
+u928@master:~/fl/kmeansTest$ spark-submit --driver-class-path ./lib/mysql-connector-java-5.1.41-bin.jar --class "trojanDetection" ./trojan-kmeans_2.11-1.0.jar /tcpheader/normalizeDataSet_v2.txt /tcpheader/trainSet_v2.txt 15 100 5 0.01
 # K-Means algorithm test
 $ spark-submit --class "nadsTrojan" ./trojan-kmeans_2.11-1.0.jar /tcpheader/trainSet.txt /tcpheader/tcp_test.txt 3 30 3
-
 ```
 
 #### Scala
