@@ -1,4 +1,4 @@
-package com.jerryfang.ml
+//package com.jerryfang.ml
 
 import java.util.Properties
 import scala.collection.mutable.HashMap
@@ -11,16 +11,17 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{SQLContext, Row}
-import org.apache.spark.sql.types.{StringType, IntegerType, StructField, StructType, TimestampType}
+import org.apache.spark.sql.types._
+import java.util.Date 
+import java.text.SimpleDateFormat
 
-
-object nadsTrojan {
+object trojanDetection {
     
     def main(args: Array[String]){
 
         //check parameters
         if(args.length < 6){
-            println("Usage: nadsTrojan trainingDataFilePath testDataFilePath numClusters numIterations runTimes")
+            println("Usage: nadsTrojan trainingDataFilePath testDataFilePath numClusters numIterations runTimes maxAnomalousClusterProportion")
             sys.exit(1)
         }
 
@@ -35,8 +36,8 @@ object nadsTrojan {
                                     StructField("upDownSize", StringType, true),
                                     StructField("synProportion", StringType, true),
                                     StructField("pshProportion", StringType, true),
-                                    StructField("smallProportion", StringType, true)//,
-                                    //StructField("troTime", TimestampType, true)
+                                    StructField("smallProportion", StringType, true),
+                                    StructField("troTime", StringType, true)
                                     ))
 
         //get raw training data
@@ -199,6 +200,12 @@ object nadsTrojan {
             clusterIndex += 1
         })
 
+        val prop = new Properties()
+        prop.put("user", "root")
+        prop.put("password", "hadoop928")
+        prop.put("driver", "com.mysql.jdbc.Driver")
+        val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
         if(anomalousArray.isEmpty){
             println("[debug] There is no anomalous cluster...")
         }
@@ -228,15 +235,14 @@ object nadsTrojan {
                     (ip, data)
                 })
                 //木马检测结果写入数据库
+                val trojanTime:String = dateFormat.format(new Date())
+                //val trojanTime = dateFormat.parse(trojanTimeStr)
                 val rowRDD = trojanRDD.map({ case(ip, p) => Row(ip.trim, p(0).toString.trim, p(1).toString.trim, p(2).toString.trim, p(3).toString.trim,
-                                                    p(4).toString.trim, p(5).toString.trim, p(6).toString.trim )
+                                                    p(4).toString.trim, p(5).toString.trim, p(6).toString.trim, trojanTime.trim)
                                         })
                 val trojanDataFrame = sqlContext.createDataFrame(rowRDD, schema)
-                val prop = new Properties()
-                prop.put("user", "root")
-                prop.put("password", "hadoop928")
-                prop.put("driver", "com.mysql.jdbc.Driver")
                 trojanDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.trojan", prop)
+                println("[debug] Saved into database(anomaly.trojan)...")
 
                 /*displayClusterLabel.foreach({
                     case (pred, ip, data) => {
