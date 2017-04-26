@@ -48,14 +48,13 @@ mysql> create table trojan(
     -> synProportion varchar(16),
     -> pshProportion varchar(16),
     -> smallProportion varchar(16),
-    -> troTime datetime,
+    -> troTime varchar(20),
     -> );
 Query OK, 0 rows affected (0.72 sec)
 
 mysql> ALter table trojan add column troTime datetime;
 Query OK, 0 rows affected (0.72 sec)
 Records: 0  Duplicates: 0  Warnings: 0
-
 ```
 
 #### 写入数据库
