@@ -9,8 +9,15 @@ package com.anomaly
 import java.util.Properties
 import java.util.HashMap
 import java.util.Map
-import org.apache.hadoop.hbase.client.Put
-import org.apache.hadoop.hbase.util.Bytes
+import java.util.Date 
+import java.text.SimpleDateFormat
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkConf
+//import org.apache.hadoop.hbase.client.Put
+//import org.apache.hadoop.hbase.util.Bytes
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{SQLContext, Row}
+import org.apache.spark.sql.types._
 
 class nadsEvent {
 
@@ -38,8 +45,22 @@ class nadsEvent {
 
         //println(f"ALERT: $text%100s\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     }*/
-    def alert()
+    def alert(spark:SparkContext)
     {
-        
+        /*val sqlContext = new SQLContext(spark)
+        val schema = StructType(List(StructField("ipaddr", StringType, true), 
+                                    StructField("intervalTime", StringType, true), 
+                                    StructField("dnsTimes", StringType, true),
+                                    StructField("upDownNumber", StringType, true),
+                                    StructField("upDownSize", StringType, true),
+                                    StructField("synProportion", StringType, true),
+                                    StructField("pshProportion", StringType, true),
+                                    StructField("smallProportion", StringType, true),
+                                    StructField("troTime", StringType, true)
+                                    ))*/
+        println("[debug] alert event...")
+        println("[debug] Event Title: " + title)
+        println("[debug] Event Content: ")
+        println("[debug] " + text)
     }
 }

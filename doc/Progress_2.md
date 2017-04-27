@@ -139,4 +139,17 @@
 ##### Self-Rate
 
 * 完成写入至数据库（连接jdbc手动指定连接器的方式是否可以改进？）
-* ​
+* 完成DDoS
+* 未做：论文
+
+#### April 27th, 2017 Thursday
+
+##### Work Arrangements
+
+* DDoS Detection.scala , nadsFlow.scala, nadsEvent.scala, runDDoSDetection.scala
+* 首先以离线文件的方式测试，然后转streaming方式（包括实时写数据库）
+* 如有时间，做一下前端展示。
+* 论文要求，内容提纲（20:00--21:30）
+
+##### Self-Rate
+
