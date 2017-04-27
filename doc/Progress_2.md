@@ -147,9 +147,11 @@
 ##### Work Arrangements
 
 * DDoS Detection.scala , nadsFlow.scala, nadsEvent.scala, runDDoSDetection.scala
-* 首先以离线文件的方式测试，然后转streaming方式（包括实时写数据库）
+* 首先以离线文件的方式测试，然后使用Kafka作为输入源，转streaming方式（包括实时写数据库）
 * 如有时间，做一下前端展示。
 * 论文要求，内容提纲（20:00--21:30）
 
 ##### Self-Rate
 
+* debug完成，离线测试（5min, 46846个半session）
+* 学习使用Kafka作为输入源

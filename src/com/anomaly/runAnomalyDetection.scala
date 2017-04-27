@@ -20,9 +20,9 @@ object runAnomalyDetection {
                           //.set("spark.default.parallelism", "160") // 160
                           
 	    val spark = new SparkContext(sparkConf)
-	    val filePath = args[0]
+	    val filePath = args(0)
 	    val flow = new nadsFlow(spark, filePath)
-	    val nadsRDD = flow.getRDD()
+	    val nadsRDD = flow.getRDD
 	    ddosDetection.run(nadsRDD, spark)
 	}
     

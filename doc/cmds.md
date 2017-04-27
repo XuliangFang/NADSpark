@@ -24,6 +24,14 @@ $ spark-submit --class "nadsTrojan" ./trojan-kmeans_2.11-1.0.jar /tcpheader/trai
 $ sbt package
 ```
 
+#### Kafka
+
+```shell
+# host: u928@10.255.0.10 hadoop928
+u928@slaver1:~$ kafka-console-consumer.sh --bootstrap-server master:9092  --topic tcp-stream > ./fl/tcpsession.txt
+
+```
+
 #### MySQL
 
 ```shell

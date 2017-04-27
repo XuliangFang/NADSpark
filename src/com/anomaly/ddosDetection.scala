@@ -9,17 +9,17 @@ import scala.collection.mutable.HashSet
 import scala.collection.mutable.Map
 import scala.math.floor
 import scala.math.log
-import org.apache.hadoop.hbase.client.Scan
-import org.apache.hadoop.hbase.util.Bytes
+//import org.apache.hadoop.hbase.client.Scan
+//import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.PairRDDFunctions
 import org.apache.spark.rdd.RDD
 import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
-object ddosDetection extends Any {
+object ddosDetection {
 
     val FlowListLimit = 1000 //maximum of flow number in a list
-    val ddosMinConnectionThreshold = 80 //need to be optimized later
+    val ddosMinConnectionsThreshold = 80 //need to be optimized later
     val ddosMinPairsThreshold = 35 //need to be optimized later
     //consideration....
     val ddosExceptionAlienPorts:Set[String] = Set("80","443","587","465","993","995")
@@ -73,7 +73,7 @@ object ddosDetection extends Any {
         ddosCollectionFinal
         .filter({case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,numberFlows)) =>
             numberFlows > ddosMinConnectionsThreshold &
-            !p2pTalkers.contains(myIP) & // Avoid P2P talkers
+            //!p2pTalkers.contains(myIP) & // Avoid P2P talkers
             {
                 val orderedFlowSet=
                 flowSet
@@ -119,7 +119,7 @@ object ddosDetection extends Any {
         }
         .foreach{case  (alienIP,(bytesUp,bytesDown,numberPkts,flowSet,numberFlows,pairs)) => 
         
-            println("IP: "+alienIP+ " - DDoS Attack: "+numberFlows+" Pairs: "+pairs.toString)
+            println("[debug] IP: "+alienIP+ " - DDoS Attack: "+numberFlows+" Pairs: "+pairs.toString)
             
             //val flowMap: Map[String,String] = new HashMap[String,String]
             //flowMap.put("flow:id",System.currentTimeMillis.toString)
@@ -127,8 +127,8 @@ object ddosDetection extends Any {
             event.data.put("numberFlows",numberFlows.toString)
             event.data.put("numberOfAttackers",pairs.toString)
             event.data.put("underAttackIP", alienIP)
-            event.data.put("bytesUp",   (bytesUp*sampleRate).toString)
-            event.data.put("bytesDown", (bytesDown*sampleRate).toString)
+            event.data.put("bytesUp",   bytesUp.toString)
+            event.data.put("bytesDown", bytesDown.toString)
             event.data.put("numberPkts", numberPkts.toString)
             event.data.put("stringFlows", flowSet2String(flowSet))
             event.data.put("flowsMean", ddosStats.mean.round.toString)
@@ -158,7 +158,7 @@ object ddosDetection extends Any {
                       "Abnormal behaviour: Host possibly under DDoS attack.\n"+
                       "IP: "+alienIP+"\n"+
                       "Number of Attackers: "+numberOfAttackers+"\n"+
-                      "Number of flows: "+numberOfFlows+"\n"+
+                      "Number of flows: "+numberFlows+"\n"+
                       "Mean/Stddev of flows per AlienIP (all flows for this IP): "+flowsMean+"/"+flowsStdev+"\n"+
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
                       "Bytes Down: "+humanBytes(bytesDown)+"\n"+
@@ -180,8 +180,7 @@ object ddosDetection extends Any {
                            c+"\n"+
                            //srcIP1+":"+srcPort1+" => "+dstIP1+":"+dstPort1+" "+statusInd+" ("+proto1+", Up: "+humanBytes(bytesUP*sampleRate)+", Down: "
                            //+humanBytes(bytesDOWN*sampleRate)+","+numberPkts1+" pkts, duration: "+(endTime-beginTime)+"s, sampling: 1/"+sampleRate+")"
-                           srcIP1+":"+srcPort1+" => "+dstIP1+":"+dstPort1+" ("+proto1+", Up: "+humanBytes(bytesUP)+", Down: "
-                           +humanBytes(bytesDOWN)+","+numberPkts1+" pkts, duration: "+(endTime-beginTime)+"s)"       
+                           srcIP1+":"+srcPort1+" => "+dstIP1+":"+dstPort1+" ("+proto1+", Up: "+humanBytes(bytesUP)+", Down: "+humanBytes(bytesDOWN)+","+numberPkts1+" pkts, duration: "+(endTime-beginTime)+"s)"       
                     })
     }
 
