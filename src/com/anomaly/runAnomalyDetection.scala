@@ -8,9 +8,9 @@ object runAnomalyDetection {
 
 	def main(args: Array[String]){
 		//check parameters
-		if(args.length==0 || args.length>1)
+		if(args.length<3 || args.length>3)
 		{
-			println("[debug] Usage: runAnomalyDetection filePath")
+			println("[debug] Usage: runAnomalyDetection filePath ddosMinConnectionsThreshold ddosMinPairsThreshold")
 			return
 		}
 
@@ -21,9 +21,11 @@ object runAnomalyDetection {
                           
 	    val spark = new SparkContext(sparkConf)
 	    val filePath = args(0)
+	    val ddosMinConnectionsThreshold = args(1).toInt
+    	val ddosMinPairsThreshold = args(2).toInt
 	    val flow = new nadsFlow(spark, filePath)
 	    val nadsRDD = flow.getRDD
-	    ddosDetection.run(nadsRDD, spark)
+	    ddosDetection.run(nadsRDD, spark, ddosMinConnectionsThreshold, ddosMinPairsThreshold)
 	}
     
 }

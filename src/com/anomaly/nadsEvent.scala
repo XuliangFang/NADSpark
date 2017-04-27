@@ -19,7 +19,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{SQLContext, Row}
 import org.apache.spark.sql.types._
 
-class nadsEvent {
+class nadsEvent  extends Serializable{
 
     var signature_id:Double=0
     var priorityid:Int=0
@@ -45,7 +45,7 @@ class nadsEvent {
 
         //println(f"ALERT: $text%100s\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     }*/
-    def alert(spark:SparkContext)
+    def alert()
     {
         /*val sqlContext = new SQLContext(spark)
         val schema = StructType(List(StructField("ipaddr", StringType, true), 

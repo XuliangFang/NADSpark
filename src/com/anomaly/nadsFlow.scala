@@ -13,7 +13,7 @@ class nadsFlow(spark:SparkContext, filePath:String) {
     val sc:SparkContext = spark
     val rawData = sc.textFile(file)
     val parsedRDD = rawData.map(line => {
-        line.split("\t").map(_.trim).filter(!"".equals(_))
+        line.split(" ").map(_.trim).filter(!"".equals(_))
     })
     //var nadsRDD
 

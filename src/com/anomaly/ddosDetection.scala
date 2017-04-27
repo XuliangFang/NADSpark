@@ -19,8 +19,8 @@ import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 object ddosDetection {
 
     val FlowListLimit = 1000 //maximum of flow number in a list
-    val ddosMinConnectionsThreshold = 80 //need to be optimized later
-    val ddosMinPairsThreshold = 35 //need to be optimized later
+    var ddosMinConnectionsThreshold = 6 //need to be optimized later
+    var ddosMinPairsThreshold = 5 //need to be optimized later
     //consideration....
     val ddosExceptionAlienPorts:Set[String] = Set("80","443","587","465","993","995")
 
@@ -31,13 +31,15 @@ object ddosDetection {
     //val nadsFlowSummary = flow.getFlowSummary()
 
     //run detection algorithm
-    def run(nadsRDD:RDD[(String,String,String,String,String,Long,Long,Long,Long,Long)], sc:SparkContext)
+    def run(nadsRDD:RDD[(String,String,String,String,String,Long,Long,Long,Long,Long)], sc:SparkContext, ddosMinConnections:Int, ddosMinPairs:Int)
     {
-        detect(nadsRDD, sc)
+        detect(nadsRDD, sc, ddosMinConnections, ddosMinPairs)
     }
 
-    def detect(nadsRDD:RDD[(String,String,String,String,String,Long,Long,Long,Long,Long)], sc:SparkContext)
+    def detect(nadsRDD:RDD[(String,String,String,String,String,Long,Long,Long,Long,Long)], sc:SparkContext, ddosMinConnections:Int, ddosMinPairs:Int)
     {
+        ddosMinConnectionsThreshold = ddosMinConnections
+        ddosMinPairsThreshold = ddosMinPairs
         val nadsFlowSummary = nadsRDD.map({
             case (myIP, myPort, alienIP, alienPort, proto, bytesUp, bytesDown, numberPkts, beginTime, endTime) =>
             ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime))
@@ -117,13 +119,14 @@ object ddosDetection {
         .filter{case  (alienIP,(bytesUp,bytesDown,numberPkts,flowSet,numberFlows,pairs)) => 
             pairs > ddosMinPairsThreshold 
         }
-        .foreach{case  (alienIP,(bytesUp,bytesDown,numberPkts,flowSet,numberFlows,pairs)) => 
+        .foreach{case (alienIP,(bytesUp,bytesDown,numberPkts,flowSet,numberFlows,pairs)) => 
         
             println("[debug] IP: "+alienIP+ " - DDoS Attack: "+numberFlows+" Pairs: "+pairs.toString)
             
             //val flowMap: Map[String,String] = new HashMap[String,String]
             //flowMap.put("flow:id",System.currentTimeMillis.toString)
-            val event = new nadsEvent()
+            //val eventdata:Map[String, String] = new HashMap()
+            val event:nadsEvent = new nadsEvent()
             event.data.put("numberFlows",numberFlows.toString)
             event.data.put("numberOfAttackers",pairs.toString)
             event.data.put("underAttackIP", alienIP)
@@ -133,9 +136,18 @@ object ddosDetection {
             event.data.put("stringFlows", flowSet2String(flowSet))
             event.data.put("flowsMean", ddosStats.mean.round.toString)
             event.data.put("flowsStdev", ddosStats.stdev.round.toString)
+            /*eventdata.put("numberFlows",numberFlows.toString)
+            eventdata.put("numberOfAttackers",pairs.toString)
+            eventdata.put("underAttackIP", alienIP)
+            eventdata.put("bytesUp",   bytesUp.toString)
+            eventdata.put("bytesDown", bytesDown.toString)
+            eventdata.put("numberPkts", numberPkts.toString)
+            eventdata.put("stringFlows", flowSet2String(flowSet))
+            eventdata.put("flowsMean", ddosStats.mean.round.toString)
+            eventdata.put("flowsStdev", ddosStats.stdev.round.toString)*/
             
             // DO: (write into database and display on front-end)
-            raiseDDoSEvent(event).alert(sc)       
+            raiseDDoSEvent(event).alert()
         }
     }
 
@@ -163,7 +175,7 @@ object ddosDetection {
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
                       "Bytes Down: "+humanBytes(bytesDown)+"\n"+
                       "Packets: "+numberPkts+"\n"+
-                      "Flows"+stringFlows
+                      "Flows: "+stringFlows
                       
         //event.signature_id = signature._16.signature_id  
         event

@@ -155,3 +155,29 @@
 
 * debug完成，离线测试（5min, 46846个半session）
 * 学习使用Kafka作为输入源
+
+##### Problems
+
+> Exception in thread "main" org.apache.spark.SparkException: Task not serializable
+>
+> 	at org.apache.spark.util.ClosureCleaner$.ensureSerializable(ClosureCleaner.scala:298)
+> 	at org.apache.spark.util.ClosureCleaner$.org$apache$spark$util$ClosureCleaner$$clean(ClosureCleaner.scala:288)
+> 	at org.apache.spark.util.ClosureCleaner$.clean(ClosureCleaner.scala:108)
+> 	at org.apache.spark.SparkContext.clean(SparkContext.scala:2037)
+> 	at org.apache.spark.rdd.RDD$$anonfun$foreach$1.apply(RDD.scala:874)
+> 	at org.apache.spark.rdd.RDD$$anonfun$foreach$1.apply(RDD.scala:873)
+> 	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)
+> 	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)
+> 	at org.apache.spark.rdd.RDD.withScope(RDD.scala:358)
+> 	at org.apache.spark.rdd.RDD.foreach(RDD.scala:873)
+> 	at com.anomaly.ddosDetection$.detect(ddosDetection.scala:120)
+> 	at com.anomaly.ddosDetection$.run(ddosDetection.scala:36)
+> 	at runAnomalyDetection$.main(runAnomalyDetection.scala:26)
+> 	at runAnomalyDetection.main(runAnomalyDetection.scala)
+
+> Solution：http://blog.csdn.net/sogerno1/article/details/45935159
+>
+> **1. 不在（或不直接在）map等闭包内部直接引用某类成员函数或成员变量 **
+>
+> **2.如果引用了某类的成员函数或变量，则需对相应的类做好序列化处理 **
+
