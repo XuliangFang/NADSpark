@@ -3,6 +3,7 @@ import org.apache.spark.SparkContext
 import com.anomaly.ddosDetection
 import com.anomaly.nadsFlow
 import com.anomaly.nadsEvent
+import com.anomaly.abusedSMTP
 
 object runAnomalyDetection {
 
@@ -25,7 +26,10 @@ object runAnomalyDetection {
     	val ddosMinPairsThreshold = args(2).toInt
 	    val flow = new nadsFlow(spark, filePath)
 	    val nadsRDD = flow.getRDD
+	    //detection of DDoS
 	    ddosDetection.run(nadsRDD, spark, ddosMinConnectionsThreshold, ddosMinPairsThreshold)
+	    //detection of Abused SMTP Server
+	    abusedSMTP.run(nadsRDD, spark)
 	}
     
 }

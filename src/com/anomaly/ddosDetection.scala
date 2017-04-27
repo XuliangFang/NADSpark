@@ -136,15 +136,6 @@ object ddosDetection {
             event.data.put("stringFlows", flowSet2String(flowSet))
             event.data.put("flowsMean", ddosStats.mean.round.toString)
             event.data.put("flowsStdev", ddosStats.stdev.round.toString)
-            /*eventdata.put("numberFlows",numberFlows.toString)
-            eventdata.put("numberOfAttackers",pairs.toString)
-            eventdata.put("underAttackIP", alienIP)
-            eventdata.put("bytesUp",   bytesUp.toString)
-            eventdata.put("bytesDown", bytesDown.toString)
-            eventdata.put("numberPkts", numberPkts.toString)
-            eventdata.put("stringFlows", flowSet2String(flowSet))
-            eventdata.put("flowsMean", ddosStats.mean.round.toString)
-            eventdata.put("flowsStdev", ddosStats.stdev.round.toString)*/
             
             // DO: (write into database and display on front-end)
             raiseDDoSEvent(event).alert()

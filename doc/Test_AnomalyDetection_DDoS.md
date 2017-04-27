@@ -149,5 +149,9 @@ Flows:
 222.199.191.32:443 => 210.35.99.251:49798 (TCP, Up: 149 B, Down: 128 B,4 pkts, duration: 0s)
 222.199.191.32:443 => 210.35.99.251:49570 (TCP, Up: 149 B, Down: 128 B,4 pkts, duration: 0s)
 222.199.191.49:80 => 210.35.99.251:28273 (TCP, Up: 134 B, Down: 128 B,4 pkts, duration: 13s)
+
+Detecting Abused SMTP Server
+[debug] SIZESIZESIZE Map((202.121.223.3,182.254.34.84) -> 1, (202.121.223.30,182.254.34.84) -> 1)
+
 ```
 

@@ -18,18 +18,23 @@ import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
 object abusedSMTP {
     
-    var abusedSMTPBytesThreshold = 50000000L // about 50M
-    var abusedSMTPConnectionsThreshold = 50 
+    val FlowListLimit = 100
+    var abusedSMTPBytesThreshold = 5000000L // about 50M
+    var abusedSMTPConnectionsThreshold = 10 
 
     def run(nadsRDD:RDD[(String,String,String,String,String,Long,Long,Long,Long,Long)], sc:SparkContext)
     {
         println("")
-        println("Abused SMTP Server")
-        val abusedSMTPCollection: PairRDDFunctions[(String, String), (Long,Long,Long,HashSet[(String,String,String,String,String,Long,Long,Long,Int,Long,Long,Long,Int)],Long,Long)] = sflowSummary
-        .filter({case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime)) 
+        println("Detecting Abused SMTP Server")
+        val nadsFlowSummary = nadsRDD.map({
+            case (myIP, myPort, alienIP, alienPort, proto, bytesUp, bytesDown, numberPkts, beginTime, endTime) =>
+            ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime))
+        })
+        val abusedSMTPCollection: PairRDDFunctions[(String, String), (Long,Long,Long,HashSet[(String,String,String,String,String,Long,Long,Long,Long,Long)],Long)] = 
+        nadsFlowSummary.filter({case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime)) 
                       =>  
-                          ( myPort.equals("465") | //SMTPS protocol 465-->>SSL  587 -->> TLS
-                            myPort.equals("587")
+                          ( alienPort.equals("465") | //SMTPS protocol 465-->>SSL  587 -->> TLS
+                            alienPort.equals("587")
                           ) &
                           proto.equals("TCP")  //&
                           //!isMyIP(alienIP,myNets) 
@@ -41,61 +46,56 @@ object abusedSMTP {
                    ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,1L))
             })
       
-      
+        //输出中间结果
+        println("[debug] All IP->SMTP_Server flow size(count by key): " + abusedSMTPCollection.countByKey().toString)
+
         abusedSMTPCollection
         .reduceByKey({
                        case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,connectionsA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,connectionsB)) =>
                             (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, connectionsA+connectionsB)
                     })
         .filter({ case  ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) => 
-                        connections>50 &
-                        bytesDown > abusedSMTPBytesThreshold
+                        connections>abusedSMTPConnectionsThreshold &
+                        bytesUp > abusedSMTPBytesThreshold
                })
         .sortBy({ 
-                  case   ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) =>    bytesDown  
+                  case   ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) =>    bytesUp  
                 }, false, 15
                )
         .take(100)
         .foreach{ case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) => 
                         println("("+myIP+","+alienIP+","+bytesUp+")" ) 
-                        val flowMap: Map[String,String] = new HashMap[String,String]
-                        flowMap.put("flow:id",System.currentTimeMillis.toString)
-                        val event = new NadsEvent(new HogFlow(flowMap,myIP,alienIP))
-                        
-                        event.data.put("hostname", myIP)
-                        event.data.put("bytesUp",   (bytesUp*sampleRate).toString)
-                        event.data.put("bytesDown", (bytesDown*sampleRate).toString)
+                        //val flowMap: Map[String,String] = new HashMap[String,String]
+                        //flowMap.put("flow:id",System.currentTimeMillis.toString)
+                        val event = new nadsEvent()
+                        event.data.put("hostname", alienIP)
+                        event.data.put("bytesUp",   bytesUp.toString)
+                        event.data.put("bytesDown", bytesDown.toString)
                         event.data.put("numberPkts", numberPkts.toString)
                         event.data.put("connections", connections.toString)
-                        event.data.put("stringFlows", setFlows2String(flowSet))
+                        event.data.put("stringFlows", flowSet2String(flowSet))
                         
                         raiseAbusedSMTPEvent(event).alert()
         }
     }
 
     def raiseAbusedSMTPEvent(event:nadsEvent) = {
-        val numberFlows:String = event.data.get("numberFlows")
-        val numberOfAttackers:String = event.data.get("numberOfAttackers")
-        val alienIP:String = event.data.get("underAttackIP")
+        
+        val hostname:String = event.data.get("hostname")
         val bytesUp:String = event.data.get("bytesUp")
         val bytesDown:String = event.data.get("bytesDown")
         val numberPkts:String = event.data.get("numberPkts")
         val stringFlows:String = event.data.get("stringFlows")
-        val flowsMean:String = event.data.get("flowsMean")
-        val flowsStdev:String = event.data.get("flowsStdev")
-
-        event.title = "DDoS Detection Event"
-    
+        val connections:String = event.data.get("connections")
+        
         event.text = "This IP was detected by NADSpark performing an abnormal activity. In what follows, you can see more information.\n"+
-                      "Abnormal behaviour: Host possibly under DDoS attack.\n"+
-                      "IP: "+alienIP+"\n"+
-                      "Number of Attackers: "+numberOfAttackers+"\n"+
-                      "Number of flows: "+numberFlows+"\n"+
-                      "Mean/Stddev of flows per AlienIP (all flows for this IP): "+flowsMean+"/"+flowsStdev+"\n"+
+                      "Abnormal behaviour: Host is receiving too many e-mail submissions. May be an abused SMTP server. \n"+
+                      "IP: "+hostname+"\n"+
                       "Bytes Up: "+humanBytes(bytesUp)+"\n"+
                       "Bytes Down: "+humanBytes(bytesDown)+"\n"+
                       "Packets: "+numberPkts+"\n"+
-                      "Flows: "+stringFlows
+                      "Connections: "+connections+"\n"+
+                      "Flows"+stringFlows 
         event
     }
     
