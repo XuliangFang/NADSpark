@@ -3,6 +3,7 @@
 ```shell
 #Upload file
 $ hdfs dfs -put <localfile> <hdfs path>
+u928@master:~/fl/anomalyDetection$ hdfs dfs -put ./tcp_session_5min.txt /tcpSession/tcp_session_5min.txt
 #list file
 $ hdfs dfs -ls [hdfspath]
 #download file
