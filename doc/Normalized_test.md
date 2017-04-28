@@ -25,11 +25,9 @@
 
 #### 测试结果
 
-##### k=15, 21 anomalous IPs
+##### k=15, 26 anomalous IPs
 
-```shell
-
-```
+![trojan_result_mysql](../pics/trojan_result_mysql.png)
 
 
 
