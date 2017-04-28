@@ -184,3 +184,18 @@
 * myIP alienIP颠倒问题，需要修改[done]
 * 未彻底解决task not serializable问题
 * 后续需要将结果写入数据库，等人杰学长将后台迁移至新的框架下
+
+#### April 28th, 2017 Friday
+
+##### Group Meeting
+
+* 异常检测结果需要直观展示出来（中文化，主要维度，给结果打标签，平均值，详细信息）
+* 时间戳应该是数据本身的时间，否则没有意义
+* 已知数据集测试算法有效性（目前打算使用：KDD'99）
+* 服务器异常流量的检测标准（adpative learning or other methods）
+
+##### Work Arrangements
+
+* [FAST] Save model for Shengjieluo: HDFS /fangliang/KmeansModel && 
+* [TEST] 测试带标签的数据集KDD'99
+* [Consideration] 服务器异常流量的常用检测方法

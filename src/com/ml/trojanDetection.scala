@@ -112,7 +112,9 @@ object trojanDetection {
         val runTimes = args(4).toInt
         var clusterIndex:Int = 0
         val clusters:KMeansModel = KMeans.train(trainData, numClusters, numIterations, runTimes)
-        //clusters.save(sc, "/tcpheader/KmeansModel")
+        //save kmeans model to HDFS: /fangliang/KmeansModel
+        clusters.save(sc, "/fangliang/KmeansModel")
+        
         //when need to load
         //val sameModel = KMeansModel.load(sc, "/tcpheader/KMeansModel")
         //added on 18th April
@@ -189,7 +191,10 @@ object trojanDetection {
 
         val anomalousArray = clusterLabelCount.filter({
             kv => (kv._2.toDouble < threshold  && kv._2.toDouble > minProportion)  
-        }).map(_._1)
+        }).map({
+            case(cluster, number) =>
+            cluster
+        })
 
         //show results
 
@@ -205,6 +210,40 @@ object trojanDetection {
         prop.put("password", "hadoop928")
         prop.put("driver", "com.mysql.jdbc.Driver")
         val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
+        //Save anomalous cluster index array into database
+        if(!anomalousArray.isEmpty){
+            val anomalousRDD = sc.parallelize(anomalousArray.toList)
+            val clusterTime:String = dateFormat.format(new Date())
+            val indexRowRDD = anomalousRDD.map({
+                t => 
+                Row(t.toString.trim, clusterTime.trim)
+            })
+            val indexSchema = StructType(List(StructField("clusterIndex", StringType, true), 
+                                    StructField("clusterTime", StringType, true)
+                                    ))
+            val indexDataFrame = sqlContext.createDataFrame(indexRowRDD, indexSchema)
+            indexDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.kmeansIndex", prop)
+            println("[debug] Saved anomalous cluster index into database(anomaly.kmeansIndex)...")
+        } 
+
+        //Save dataset means and stdevs for ShengjieLuo
+        val statisticTime:String = dateFormat.format(new Date())
+        val meansRDD = sc.parallelize(means) //convert to RDD
+        val meansRowRDD = meansRDD.map(t => Row(t.toString.trim, statisticTime.trim))
+        val stdevsRDD = sc.parallelize(stdevs)
+        val stdRowRDD = stdevsRDD.map(t => Row(t.toString.trim, statisticTime.trim))
+        val meansSchema = StructType(List(StructField("means", StringType, true),
+                                    StructField("meansTime", StringType, true)
+                                    ))
+        val stdSchema = StructType(List(StructField("stdevs", StringType, true),
+                                    StructField("stdevsTime", StringType, true)
+                                    ))
+        val meansDataFrame = sqlContext.createDataFrame(meansRowRDD, meansSchema)
+        val stdDataFrame = sqlContext.createDataFrame(stdRowRDD, stdSchema)
+        meansDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.means", prop)
+        stdDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.stdevs", prop)
+        println("[debug] Saved dataset means and stdevs into database(anomaly.means and anomaly.stdevs)...")
 
         if(anomalousArray.isEmpty){
             println("[debug] There is no anomalous cluster...")

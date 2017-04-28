@@ -640,7 +640,6 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] Sum of squared distances of points to their nearest center when K=18 --->>> 0.712376359617301
 [debug] Sum of squared distances of points to their nearest center when K=19 --->>> 0.6796333100821896
 [debug] Sum of squared distances of points to their nearest center when K=20 --->>> 0.6327520355573425
-
 ```
 
 
