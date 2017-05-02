@@ -199,3 +199,11 @@
 * [FAST] Save model for Shengjieluo: HDFS /fangliang/KmeansModel && 
 * [TEST] 测试带标签的数据集KDD'99
 * [Consideration] 服务器异常流量的常用检测方法
+
+#### May 1st, 2017 Monday
+
+##### Work Arrangements
+
+* PPT for SecurityDefenceIntroduction
+* 论文提纲与主要内容（摘要部分，测试部分）
+* 毕业设计工作日志
