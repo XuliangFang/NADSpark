@@ -18,64 +18,145 @@ import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
 object horizontalPortScan {
     
-    val FlowListLimit = 100
-    var abusedSMTPBytesThreshold = 5000000L // about 50M
-    var abusedSMTPConnectionsThreshold = 10 
+    val hPortScanMinFlowsThreshold = 100
+    val hPortScanExceptionPorts = Set("80","443","53")
+    val hPortScanExceptionInternalPorts = Set("123")
 
     def run(nadsRDD:RDD[(String,String,String,String,String,Long,Long,Long,Long,Long)], sc:SparkContext)
     {
         println("")
         println("Detecting Horizontal Port Scan")
-        val nadsFlowSummary = nadsRDD.map({
-            case (myIP, myPort, alienIP, alienPort, proto, bytesUp, bytesDown, numberPkts, beginTime, endTime) =>
-            ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime))
+        
+        val hPortScanCollection: PairRDDFunctions[(String,String,String), (Long,Long,Long,HashSet[(String,String,String,String,String,Long,Long,Long,Long,Long)],Long,Long)] = 
+        nadsFlowSummary
+        .filter({case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime)) 
+                  => !hPortScanExceptionPorts.contains(alienPort)  & // Avoid common ports
+                     (   
+                        //!isMyIP(alienIP, myNets) ||
+                        !hPortScanExceptionInternalPorts.contains(alienPort) ) &
+                        numberPkts < 5 // few pkts per flow
         })
-        val abusedSMTPCollection: PairRDDFunctions[(String, String), (Long,Long,Long,HashSet[(String,String,String,String,String,Long,Long,Long,Long,Long)],Long)] = 
-        nadsFlowSummary.filter({case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime)) 
-                      =>  
-                          ( alienPort.equals("465") | //SMTPS protocol 465-->>SSL  587 -->> TLS
-                            alienPort.equals("587")
-                          ) &
-                          proto.equals("TCP")  //&
-                          //!isMyIP(alienIP,myNets) 
-               })
         .map({
-              case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime)) =>
-                   val flowSet:HashSet[(String,String,String,String,String,Long,Long,Long,Long,Long)] = new HashSet()
-                   flowSet.add((myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,beginTime,endTime))
-                   ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,1L))
-            })
-      
-        //输出中间结果
-        println("[debug] All IP->SMTP_Server flow size(count by key): " + abusedSMTPCollection.countByKey().toString)
+        case ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime)) =>
+            val flowSet:HashSet[(String,String,String,String,String,Long,Long,Long,Long,Long)] = new HashSet()
+            flowSet.add((myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,beginTime,endTime))
+            ((myIP,alienIP,alienPort),(bytesUp,bytesDown,numberPkts,flowSet,1L,1L))
+        })
 
-        abusedSMTPCollection
+        val hPortScanCollectionFinal=
+        hPortScanCollection
         .reduceByKey({
-                       case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,connectionsA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,connectionsB)) =>
-                            (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, connectionsA+connectionsB)
+        case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,numberOfflowsA,numberOffPairsA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,numberOfflowsB,numberOffPairsB)) =>
+          (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, numberOfflowsA+numberOfflowsB,1L)
+        })
+        .map({
+            case ((myIP,alienIP,alienPort),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOffPairsPort)) =>
+            ((myIP,alienPort),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOffPairsPort))
+        })
+        .reduceByKey({
+            case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,numberOfflowsA,numberOffPairsA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,numberOfflowsB,numberOffPairsB)) =>
+            (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, numberOfflowsA+numberOfflowsB,numberOffPairsA+numberOffPairsB)
+        })
+        .cache
+      
+        val hPortScanStats = 
+        hPortScanCollectionFinal
+        .map({case ((myIP,alienPort),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOffPairsPort)) =>
+            numberOffPairsPort
+        }).stats()
+
+        hPortScanCollectionFinal
+        .filter({case ((myIP,alienPort),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOfPairsPort)) =>
+            numberOfPairsPort > hPortScanMinFlowsThreshold
+        })
+        .map({
+            case ((myIP,alienPort),(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOfPairsPort)) =>
+        
+            val histogram: Map[String,Double] = new HashMap()
+            histogram.put(alienPort,numberOfPairsPort)
+             
+            (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOfPairsPort,histogram))
+        })
+        .reduceByKey({
+            case ((bytesUpA,bytesDownA,numberPktsA,flowSetA,numberOfflowsA,numberOfPairsPortA,histogramA),(bytesUpB,bytesDownB,numberPktsB,flowSetB,numberOfflowsB,numberOfPairsPortB,histogramB)) =>
+             
+            histogramB./:(0){case  (c,(key,qtdH))=> val qtdH2 = {if(histogramA.get(key).isEmpty) 0D else histogramA.get(key).get }
+                                                            histogramA.put(key,  qtdH2 + qtdH) 
+                                                            0
+                            }
+            (bytesUpA+bytesUpB,bytesDownA+bytesDownB, numberPktsA+numberPktsB, flowSetA++flowSetB, numberOfflowsA+numberOfflowsB,numberOfPairsPortA+numberOfPairsPortB, histogramA)
+        })
+        /*.filter{case (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOfPairsPort,numPorts,sampleRate)) =>
+                       !p2pTalkers.contains(myIP)// Avoid P2P talkers
+        }*/
+        .foreach{
+            case  (myIP,(bytesUp,bytesDown,numberPkts,flowSet,numberOfflows,numberOfPairsPort,histogram)) => 
+
+                if(numberOfPairsPort > 100)
+                {
+                    val atypical = histogram.filter({ case (port, numPairsPort) => 
+                        !port.equals("25") //avoid SMTP
                     })
-        .filter({ case  ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) => 
-                        connections>abusedSMTPConnectionsThreshold &
-                        bytesUp > abusedSMTPBytesThreshold
-               })
-        .sortBy({ 
-                  case   ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) =>    bytesUp  
-                }, false, 15
-               )
-        .take(100)
-        .foreach{ case ((myIP,alienIP),(bytesUp,bytesDown,numberPkts,flowSet,connections)) => 
-                        println("("+myIP+","+alienIP+","+bytesUp+")" ) 
-                        //val flowMap: Map[String,String] = new HashMap[String,String]
-                        //flowMap.put("flow:id",System.currentTimeMillis.toString)
-                        val event = new nadsEvent()
-                        event.data.put("hostname", alienIP)
-                        event.data.put("bytesUp",   bytesUp.toString)
-                        event.data.put("bytesDown", bytesDown.toString)
-                        event.data.put("numberPkts", numberPkts.toString)
-                        event.data.put("connections", connections.toString)
-                        event.data.put("stringFlows", flowSet2String(flowSet))
+
+                    if(atypical.size>0)
+                    {
+                        println("IP: "+myIP+ "  (N:1,Pairs(IP->aline Port) Size:"+numberOfPairsPort+") - Horizontal PortScan: "+numberOfflows+", Ports: "+atypical.toString)
+                            
+                            val event = new nadsEvent()
+                            event.data.put("numberOfFlows",numberOfflows.toString)
+                            event.data.put("numberOfFlowsAlienPort",numberOfPairsPort.toString)
+                            event.data.put("numberOfFlowsPerPort",atypical.map({case (port,number) => port+"="+number}).mkString("[",", ","]"))
+                            event.data.put("myIP", myIP)
+                            event.data.put("bytesUp",   bytesUp.toString)
+                            event.data.put("bytesDown", bytesDown.toString)
+                            event.data.put("numberPkts", numberPkts.toString)
+                            event.data.put("stringFlows", setFlows2String(flowSet.filter({p => atypical.keySet.contains(p._4)})))
+                            event.data.put("flowsMean", hPortScanStats.mean.round.toString)
+                            event.data.put("flowsStdev", hPortScanStats.stdev.round.toString)
+                            
+                            event.data.put("ports",flowSet
+                                            .map({case (myIP,myPort,alienIP,alienPort,proto,bytesUp,bytesDown,numberPkts,beginTime,endTime) =>
+                                                (proto,alienPort)
+                                            }).toArray
+                                            .distinct
+                                            .map({case (proto,alienPort) => proto+"/"+alienPort})
+                                            .mkString(", ")
+                                        )
+                            
+                            raiseHorizontalPortScanEvent(event).alert()
+                    }
+        
+                /*val savedHistogram=HogHBaseHistogram.getHistogram("HIST07-"+myIP)
+                
+                val hogHistogramOpenPorts=HogHBaseHistogram.getHistogram("HIST01-"+myIP)
+               
+                if(savedHistogram.histSize< 100)
+                {
+                  HogHBaseHistogram.saveHistogram(Histograms.mergeMax(savedHistogram, new HogHistogram("",numberOfPairsPort,histogram)))
+                }else
+                {
+                    val atypical   = histogram.filter({ case (port,numPairsPort) =>
                         
-                        raiseHorizontalPortScanEvent(event).alert()
+                        if(port.equals("25") && Histograms.isTypicalEvent(hogHistogramOpenPorts.histMap, "25"))
+                        {
+                            false // Avoid FP with SMTP servers
+                        }
+                            
+                        if(savedHistogram.histMap.get(port).isEmpty)
+                        {
+                            true // This MyIP never accessed so much distinct Aliens in the same port
+                        }
+                        else{
+                            if(savedHistogram.histMap.get(port).get.toLong < numPairsPort)
+                              true // This MyIP never accessed so much distinct Aliens in the same port
+                            else
+                              false // Is typical
+                        }
+                    })*/
+                }
+                else{
+                    println("[debug] NADSpark[Horizontal Port Scan]: No result..")
+                }
         }
     }
 
