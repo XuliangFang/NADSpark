@@ -4,6 +4,7 @@ import com.anomaly.ddosDetection
 import com.anomaly.nadsFlow
 import com.anomaly.nadsEvent
 import com.anomaly.abusedSMTP
+import com.anomaly.horizontalPortSan
 
 object runAnomalyDetection {
 
@@ -30,6 +31,8 @@ object runAnomalyDetection {
 	    ddosDetection.run(nadsRDD, spark, ddosMinConnectionsThreshold, ddosMinPairsThreshold)
 	    //detection of Abused SMTP Server
 	    abusedSMTP.run(nadsRDD, spark)
+	    //detection of Horizontal Port Scan
+	    horizontalPortSan.run(nadsRDD, spark)
 	}
     
 }

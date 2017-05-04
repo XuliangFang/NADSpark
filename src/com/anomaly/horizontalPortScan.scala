@@ -18,6 +18,7 @@ import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
 
 object horizontalPortScan {
     
+    val FlowListLimit = 100
     val hPortScanMinFlowsThreshold = 100
     val hPortScanExceptionPorts = Set("80","443","53")
     val hPortScanExceptionInternalPorts = Set("123")
@@ -26,6 +27,11 @@ object horizontalPortScan {
     {
         println("")
         println("Detecting Horizontal Port Scan")
+
+        val nadsFlowSummary = nadsRDD.map({
+            case (myIP, myPort, alienIP, alienPort, proto, bytesUp, bytesDown, numberPkts, beginTime, endTime) =>
+            ((myIP,myPort,alienIP,alienPort,proto),(bytesUp,bytesDown,numberPkts,beginTime,endTime))
+        })
         
         val hPortScanCollection: PairRDDFunctions[(String,String,String), (Long,Long,Long,HashSet[(String,String,String,String,String,Long,Long,Long,Long,Long)],Long,Long)] = 
         nadsFlowSummary
@@ -110,7 +116,7 @@ object horizontalPortScan {
                             event.data.put("bytesUp",   bytesUp.toString)
                             event.data.put("bytesDown", bytesDown.toString)
                             event.data.put("numberPkts", numberPkts.toString)
-                            event.data.put("stringFlows", setFlows2String(flowSet.filter({p => atypical.keySet.contains(p._4)})))
+                            event.data.put("stringFlows", flowSet2String(flowSet.filter({p => atypical.keySet.contains(p._4)})))
                             event.data.put("flowsMean", hPortScanStats.mean.round.toString)
                             event.data.put("flowsStdev", hPortScanStats.stdev.round.toString)
                             
@@ -191,7 +197,7 @@ object horizontalPortScan {
                       "Packets: "+numberPkts+"\n"+
                       "Flows"+stringFlows
                       
-        event.signature_id = signature._14.signature_id  
+        //event.signature_id = signature._14.signature_id  
         event
     }
     
@@ -206,7 +212,7 @@ object horizontalPortScan {
                            c+"\n"+
                            //srcIP1+":"+srcPort1+" => "+dstIP1+":"+dstPort1+" "+statusInd+" ("+proto1+", Up: "+humanBytes(bytesUP*sampleRate)+", Down: "
                            //+humanBytes(bytesDOWN*sampleRate)+","+numberPkts1+" pkts, duration: "+(endTime-beginTime)+"s, sampling: 1/"+sampleRate+")"
-                           srcIP1+":"+srcPort1+" => "+dstIP1+":"+dstPort1+" ("+proto1+", Up: "+humanBytes(bytesUP)+", Down: "+humanBytes(bytesDOWN)+","+numberPkts1+" pkts, duration: "+(endTime-beginTime)+"s)"       
+                           srcIP1+":"+srcPort1+" => "+dstIP1+":"+dstPort1+" ("+proto1+", Up: "+humanBytes(bytesUP)+", Down: "+humanBytes(bytesDOWN)+","+numberPkts1+" pkts, duration: "+(endTime.toDouble - beginTime.toDouble)+"s)"       
                     })
     }
 
