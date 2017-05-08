@@ -64,6 +64,19 @@ Query OK, 0 rows affected (0.72 sec)
 mysql> ALter table trojan add column troTime datetime;
 Query OK, 0 rows affected (0.72 sec)
 Records: 0  Duplicates: 0  Warnings: 0
+
+###建立异常事件表
+create table events(
+	id bigint primary key not null auto_increment,
+	ipaddr varchar(16),
+	category varchar(16),
+	shortContent varchar(128),
+	status boolean default false,
+	event_time varchar(20)
+	);
+	insert into events (ipaddr,category,shortContent,status,event_time) values ("89.248.167.131","木马","疑似木马，请查看详情",false,"2017-04-28 17:24:42");
+  ####修改表格编码方式，以插入中文
+  alter table ttname CONVERT TO CHARACTER SET utf8;
 ```
 
 #### 写入数据库
