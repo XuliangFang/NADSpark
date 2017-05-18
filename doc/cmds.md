@@ -48,22 +48,20 @@ Query OK, 1 row affected (0.11 sec)
 mysql> use anomaly
 Database changed
 mysql> create table trojan(
-    -> id int(4) primary key not null auto_increment,
-    -> ipaddr varchar(16),
-    -> intervalTime varchar(16),
-    -> dnsTimes varchar(16),
-    -> upDownNumber varchar(16),
-    -> upDownSize varchar(16),
-    -> synProportion varchar(16),
-    -> pshProportion varchar(16),
-    -> smallProportion varchar(16),
-    -> troTime varchar(20),
-    -> );
+     id int(4) primary key not null auto_increment,
+     ipaddr varchar(16),
+     intervalTime varchar(16),
+     dnsTimes varchar(16),
+     upDownNumber varchar(16),
+     upDownSize varchar(16),
+     synProportion varchar(16),
+     pshProportion varchar(16),
+     smallProportion varchar(16),
+     troTime varchar(20),
+     );
 Query OK, 0 rows affected (0.72 sec)
 
-mysql> ALter table trojan add column troTime datetime;
-Query OK, 0 rows affected (0.72 sec)
-Records: 0  Duplicates: 0  Warnings: 0
+mysql> 
 
 ###建立异常事件表
 create table events(
@@ -101,5 +99,19 @@ prop.put("password", "hadoop") //表示密码是hadoop
 prop.put("driver","com.mysql.jdbc.Driver") //表示驱动程序是com.mysql.jdbc.Driver
 //下面就可以连接数据库，采用append模式，表示追加记录到数据库spark的student表中
 studentDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/spark", "spark.student", prop)
+```
+
+```
+create table onePercentTrojan(
+     id int(4) primary key not null auto_increment,
+     intervalTime varchar(16),
+     dnsTimes varchar(16),
+     upDownNumber varchar(16),
+     upDownSize varchar(16),
+     synProportion varchar(16),
+     pshProportion varchar(16),
+     smallProportion varchar(16),
+     troTime varchar(20)
+     );
 ```
 

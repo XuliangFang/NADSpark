@@ -20,8 +20,8 @@ object trojanDetection {
     def main(args: Array[String]){
 
         //check parameters
-        if(args.length < 6){
-            println("Usage: nadsTrojan trainingDataFilePath testDataFilePath numClusters numIterations runTimes maxAnomalousClusterProportion")
+        if(args.length < 5){
+            println("Usage: nadsTrojan testDataFilePath numClusters numIterations runTimes maxAnomalousClusterProportion")
             sys.exit(1)
         }
 
@@ -40,14 +40,21 @@ object trojanDetection {
                                     StructField("troTime", StringType, true)
                                     ))
 
-        //get raw training data
+        //get raw data
         val rawTrainingData = sc.textFile(args(0))
-        val parsedTrainingData = rawTrainingData.filter(!isColumnNameLine(_)).map(line => {
-            Vectors.dense(line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble))
-        }).cache()
+        val parsedTrainingData = rawTrainingData.map(line => {
+                line.split(" ").map(_.trim).filter(!"".equals(_))
+        })
+        val arrayParsedTrainingData = parsedTrainingData.map(line => {
+            val linebuff = line.toBuffer
+            linebuff.remove(0)
+            val linearr = linebuff.toArray.map(_.toDouble)
+            linearr
+        })
+       
 
         //get IP + IP's Data file
-        val rawFullData = sc.textFile(args(1))
+        val rawFullData = sc.textFile(args(0))
         val parsedFullData = rawFullData.map(line => {
             line.split(" ").map(_.trim).filter(!"".equals(_))
         })
@@ -64,9 +71,12 @@ object trojanDetection {
         //Normalize data 
         //This part is added on Firday 14th April 2017
         println("[debug] Calculating some variables to normalize data...")
-        val arrayParsedTrainingData = rawTrainingData.filter(!isColumnNameLine(_)).map(line => {
-            line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble)
-        })
+        //val arrayParsedTrainingData = rawTrainingData.filter(!isColumnNameLine(_)).map(line => {
+            //line.split(" ").map(_.trim).filter(!"".equals(_)).map(_.toDouble)
+        //})
+
+        //println("[debug] array.first.length----------"+arrayParsedTrainingData.first.length)
+
         val n = arrayParsedTrainingData.count()
         val numCols = arrayParsedTrainingData.first.length
         val sums = arrayParsedTrainingData.reduce((a,b) => a.zip(b).map(t => t._1 + t._2))
@@ -107,13 +117,13 @@ object trojanDetection {
         val trainData = labelAndData.values.cache()
 
         //cluster the data into classes using Kmeans 
-        val numClusters = args(2).toInt
-        val numIterations = args(3).toInt
-        val runTimes = args(4).toInt
+        val numClusters = args(1).toInt
+        val numIterations = args(2).toInt
+        val runTimes = args(3).toInt
         var clusterIndex:Int = 0
         val clusters:KMeansModel = KMeans.train(trainData, numClusters, numIterations, runTimes)
         //save kmeans model to HDFS: /fangliang/KmeansModel
-        clusters.save(sc, "/fangliang/KmeansModel")
+        //clusters.save(sc, "file:///home/u928/fl/kmeansTest/kmeansModel")
         
         //when need to load
         //val sameModel = KMeansModel.load(sc, "/tcpheader/KMeansModel")
@@ -168,7 +178,7 @@ object trojanDetection {
             a
         })
         //compute proportion of every cluster
-        val maxAnomalousClusterProportion = args(5).toDouble
+        val maxAnomalousClusterProportion = args(4).toDouble
         val minDirtyProportion = 0.001
         //test data size
         val testDataSize = labelAndData.count()
@@ -210,14 +220,15 @@ object trojanDetection {
         prop.put("password", "hadoop928")
         prop.put("driver", "com.mysql.jdbc.Driver")
         val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val writeIntoTime:String = dateFormat.format(new Date())
 
         //Save anomalous cluster index array into database
         if(!anomalousArray.isEmpty){
             val anomalousRDD = sc.parallelize(anomalousArray.toList)
-            val clusterTime:String = dateFormat.format(new Date())
+            //val clusterTime:String = dateFormat.format(new Date())
             val indexRowRDD = anomalousRDD.map({
                 t => 
-                Row(t.toString.trim, clusterTime.trim)
+                Row(t.toString.trim, writeIntoTime.trim)
             })
             val indexSchema = StructType(List(StructField("clusterIndex", StringType, true), 
                                     StructField("clusterTime", StringType, true)
@@ -227,12 +238,74 @@ object trojanDetection {
             println("[debug] Saved anomalous cluster index into database(anomaly.kmeansIndex)...")
         } 
 
-        //Save dataset means and stdevs for ShengjieLuo
-        val statisticTime:String = dateFormat.format(new Date())
+        //计算1%，10%参考数据
+        println("[debug] Begin to compute reference data 1%------")
+
+        val location:Int = (testDataSize/100).toInt
+        val onePercentIntervaltime = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            intervalTime
+        }).sortBy({ 
+              case (intervalTime) => intervalTime  
+        }, false).take(location+1)(location)
+        /*toArray.sortWith( _.compareTo(_) > 0)(location)*/
+        val onePercentDnsTimes = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            dnsTimes
+        }).sortBy({ 
+              case (dnsTimes) => dnsTimes
+        }, false).take(location+1)(location)
+        val onePercentUpDownNumber = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            upDownNumber
+        }).sortBy({ 
+              case (upDownNumber) => upDownNumber
+        }, false).take(location+1)(location)
+        val onePercentUpDownSize = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            upDownSize
+        }).sortBy({ 
+              case (upDownSize) => upDownSize
+        }, false).take(location+1)(location)
+        val onePercentSynProportion = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            synProportion
+        }).sortBy({ 
+              case (synProportion) => synProportion
+        }, false).take(location+1)(location)
+        val onePercentPshProportion = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            pshProportion
+        }).sortBy({ 
+              case (pshProportion) => pshProportion
+        }, false).take(location+1)(location)
+        val onePercentSmallProportion = arrayParsedTrainingData.map({
+            case(Array(intervalTime, dnsTimes, upDownNumber, upDownSize, synProportion, pshProportion, smallProportion)) =>
+            smallProportion
+        }).sortBy({ 
+              case (smallProportion) => smallProportion
+        }, false).take(location+1)(location)
+        println("[debug] reference data [" + onePercentIntervaltime +", "+onePercentDnsTimes +", "+onePercentUpDownNumber +", "+onePercentUpDownSize +", "+onePercentSynProportion +", "+onePercentPshProportion +", "+onePercentSmallProportion + "]")
+        val onePercentSchema = StructType(List( 
+                                    StructField("intervalTime", StringType, true), 
+                                    StructField("dnsTimes", StringType, true),
+                                    StructField("upDownNumber", StringType, true),
+                                    StructField("upDownSize", StringType, true),
+                                    StructField("synProportion", StringType, true),
+                                    StructField("pshProportion", StringType, true),
+                                    StructField("smallProportion", StringType, true),
+                                    StructField("troTime", StringType, true)
+                                ))
+        val onePercentRDD = sc.parallelize(Array(onePercentIntervaltime))
+        val onePercentRowRDD = onePercentRDD.map(t => Row(onePercentIntervaltime.toString.trim, onePercentDnsTimes.toString.trim, onePercentUpDownNumber.toString.trim, onePercentUpDownSize.toString.trim, onePercentSynProportion.toString.trim, onePercentPshProportion.toString.trim, onePercentSmallProportion.toString.trim, writeIntoTime.trim))
+        val onePercentDataFrame = sqlContext.createDataFrame(onePercentRowRDD, onePercentSchema)
+        onePercentDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.onePercentTrojan", prop)
+
+        //Save dataset means and stdevs
         val meansRDD = sc.parallelize(means) //convert to RDD
-        val meansRowRDD = meansRDD.map(t => Row(t.toString.trim, statisticTime.trim))
+        val meansRowRDD = meansRDD.map(t => Row(t.toString.trim, writeIntoTime.trim))
         val stdevsRDD = sc.parallelize(stdevs)
-        val stdRowRDD = stdevsRDD.map(t => Row(t.toString.trim, statisticTime.trim))
+        val stdRowRDD = stdevsRDD.map(t => Row(t.toString.trim, writeIntoTime.trim))
         val meansSchema = StructType(List(StructField("means", StringType, true),
                                     StructField("meansTime", StringType, true)
                                     ))
@@ -274,14 +347,27 @@ object trojanDetection {
                     (ip, data)
                 })
                 //木马检测结果写入数据库
-                val trojanTime:String = dateFormat.format(new Date())
+                //val trojanTime:String = dateFormat.format(new Date())
                 //val trojanTime = dateFormat.parse(trojanTimeStr)
                 val rowRDD = trojanRDD.map({ case(ip, p) => Row(ip.trim, p(0).toString.trim, p(1).toString.trim, p(2).toString.trim, p(3).toString.trim,
-                                                    p(4).toString.trim, p(5).toString.trim, p(6).toString.trim, trojanTime.trim)
+                                                    p(4).toString.trim, p(5).toString.trim, p(6).toString.trim, writeIntoTime.trim)
                                         })
                 val trojanDataFrame = sqlContext.createDataFrame(rowRDD, schema)
                 trojanDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.trojan", prop)
                 println("[debug] Saved into database(anomaly.trojan)...")
+
+                //raise event写入数据库
+                val eventSchema = StructType(List(StructField("ipaddr", StringType, true), 
+                                    StructField("category", StringType, true), 
+                                    StructField("shortContent", StringType, true),
+                                    StructField("status", BooleanType, true),
+                                    StructField("event_time", StringType, true)
+                                    ))
+                val eventRDD = trojanRDD.map({case(ip, p) => Row(ip.trim, "Trojan", "Detected an anomaly event. Maybe a Trojan.", false, writeIntoTime.trim)
+                                        })
+                val eventDataFrame = sqlContext.createDataFrame(eventRDD, eventSchema)
+                eventDataFrame.write.mode("append").jdbc("jdbc:mysql://localhost:3306/anomaly", "anomaly.events", prop)
+                println("[debug] Saved into database(anomaly.events)...")
 
                 /*displayClusterLabel.foreach({
                     case (pred, ip, data) => {
@@ -314,7 +400,8 @@ object trojanDetection {
             //println("[debug] [Info] There are " + meaningfulAnomalyPointsCount + " anomalous IPs among " + anomalyClusterCount + " clusters.")
         }
         
-        
+        //for optimization of parameters; should be ignored when in production mode
+        /*
         println("[debug] Begin to optimize K-means model by choosing a K value that takes minimum cost.")
 
         val ks:Array[Int] = Array(8,9,10,11,12,13,14,15,16,17,18,19,20)
@@ -323,7 +410,7 @@ object trojanDetection {
             val cost = model.computeCost(trainData)
             println("[debug] Sum of squared distances of points to their nearest center when K=" + clusterNum + " --->>> " + cost)
         })
-        
+        */
     }
 
     private def isColumnNameLine(line:String):Boolean = {

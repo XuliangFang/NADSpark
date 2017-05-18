@@ -13,7 +13,7 @@
 * 尽快（新的算法）
 * 论文
 
-#### April 3rd, 2017 Wednesday 
+#### May 3rd, 2017 Wednesday 
 
 ##### Work Arrangements
 
@@ -26,7 +26,7 @@
 
 
 
-#### April 4th, 2017 Thursday
+#### May 4th, 2017 Thursday
 
 ##### Work Arrangments
 
@@ -34,7 +34,7 @@
 * 进一步分析需求。。
 * 动态阈值？（时间窗口，熵值，
 
-#### April 5th, 2017 Friday
+#### May 5th, 2017 Friday
 
 ##### Group meeting
 
@@ -47,11 +47,11 @@
 * 周末结束前完成：展示界面
 * 论文（绪论与系统设计）
 
-#### April 6th-7th, 2017 Weekend
+#### May 6th-7th, 2017 Weekend
 
 * 前端页面
 
-#### April 8th, 2017 Monday
+#### May 8th, 2017 Monday
 
 ##### Work Arrangements
 
@@ -59,6 +59,7 @@
 * 论文设计部分+绪论
 * 思考run整个过程
 * 思考是否可用KDD测试除木马以外的其他异常检测
+* 数据库乱码问题（utf-8）
 
 ##### self-rate
 
