@@ -13,6 +13,10 @@
 
 首先对测试数据做归一化（标准化处理），减少不同维度的量纲不一致带来的影响。运行K-Means算法，将21238个IP分为16个类，聚类结果中，小于最大异常比例的数据认定为异常。总共发现360个IP（分布于两个类，156+204）可能存在异常。
 
+|      |      |      |      |      |      |      |      |      |      |      |      |
+| ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
+|      |      |      |      |      |      |      |      |      |      |      |      |
+
 #### 测试说明：
 
 * 数据集大小：原始数据共750311条记录，经过数据清洗（过滤掉只有上行记录或只有下行记录的数据；过滤掉无法统计SessionTime的数据）后，得到测试数据，共21238条记录
@@ -24,6 +28,12 @@
   | 106.11.47.10 |   5.0    |   0   |   0.8   | 0.8302  |  0.25  |  1.0   | 0.31875 |
 
 #### 测试结果
+
+##### k=15, 26 anomalous IPs
+
+![trojan_result_mysql](../pics/trojan_result_mysql.png)
+
+
 
 **k=15, 202 anomalous IPs but only shows meaningful records**
 
@@ -310,7 +320,6 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] Sum of squared distances of points to their nearest center when K=18 --->>> 0.6950810283316726
 [debug] Sum of squared distances of points to their nearest center when K=19 --->>> 0.6486530905079353
 [debug] Sum of squared distances of points to their nearest center when K=20 --->>> 0.649752741108198
-
 ```
 
 **k=4, proportion=0.05, **
@@ -635,7 +644,6 @@ u928@master:~/fl/kmeansTest$ spark-submit --class "nadsTrojan" ./trojan-kmeans_2
 [debug] Sum of squared distances of points to their nearest center when K=18 --->>> 0.712376359617301
 [debug] Sum of squared distances of points to their nearest center when K=19 --->>> 0.6796333100821896
 [debug] Sum of squared distances of points to their nearest center when K=20 --->>> 0.6327520355573425
-
 ```
 
 

@@ -116,3 +116,94 @@
 * 整理数据要求给金人杰
 * SparkStreaming ??
 * 处理逻辑及代码架构
+
+##### TODO
+
+* 写入结果中timestamp字段问题
+* 处理逻辑与代码架构
+
+#### April 26th, 2017 Wednesday
+
+##### Back View
+
+今天开始，着手写论文。
+
+论文要求：
+
+##### Work Arrangements
+
+* 写入数据库，简单的前端展示
+* 新的检测代码，修改，测试（数据源要求）
+* 论文（要求，内容结构，以及总体提纲）
+
+##### Self-Rate
+
+* 完成写入至数据库（连接jdbc手动指定连接器的方式是否可以改进？）
+* 完成DDoS
+* 未做：论文
+
+#### April 27th, 2017 Thursday
+
+##### Work Arrangements
+
+* DDoS Detection.scala , nadsFlow.scala, nadsEvent.scala, runDDoSDetection.scala
+* 首先以离线文件的方式测试，然后使用Kafka作为输入源，转streaming方式（包括实时写数据库）
+* 如有时间，做一下前端展示。
+* 论文要求，内容提纲（20:00--21:30）
+
+##### Self-Rate
+
+* debug完成，离线测试（5min, 46846个半session）
+* 学习使用Kafka作为输入源
+
+##### Problems
+
+> Exception in thread "main" org.apache.spark.SparkException: Task not serializable
+>
+> 	at org.apache.spark.util.ClosureCleaner$.ensureSerializable(ClosureCleaner.scala:298)
+> 	at org.apache.spark.util.ClosureCleaner$.org$apache$spark$util$ClosureCleaner$$clean(ClosureCleaner.scala:288)
+> 	at org.apache.spark.util.ClosureCleaner$.clean(ClosureCleaner.scala:108)
+> 	at org.apache.spark.SparkContext.clean(SparkContext.scala:2037)
+> 	at org.apache.spark.rdd.RDD$$anonfun$foreach$1.apply(RDD.scala:874)
+> 	at org.apache.spark.rdd.RDD$$anonfun$foreach$1.apply(RDD.scala:873)
+> 	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:151)
+> 	at org.apache.spark.rdd.RDDOperationScope$.withScope(RDDOperationScope.scala:112)
+> 	at org.apache.spark.rdd.RDD.withScope(RDD.scala:358)
+> 	at org.apache.spark.rdd.RDD.foreach(RDD.scala:873)
+> 	at com.anomaly.ddosDetection$.detect(ddosDetection.scala:120)
+> 	at com.anomaly.ddosDetection$.run(ddosDetection.scala:36)
+> 	at runAnomalyDetection$.main(runAnomalyDetection.scala:26)
+> 	at runAnomalyDetection.main(runAnomalyDetection.scala)
+
+> Solution：http://blog.csdn.net/sogerno1/article/details/45935159
+>
+> **1. 不在（或不直接在）map等闭包内部直接引用某类成员函数或成员变量 **
+>
+> **2.如果引用了某类的成员函数或变量，则需对相应的类做好序列化处理 **
+
+* myIP alienIP颠倒问题，需要修改[done]
+* 未彻底解决task not serializable问题
+* 后续需要将结果写入数据库，等人杰学长将后台迁移至新的框架下
+
+#### April 28th, 2017 Friday
+
+##### Group Meeting
+
+* 异常检测结果需要直观展示出来（中文化，主要维度，给结果打标签，平均值，详细信息）
+* 时间戳应该是数据本身的时间，否则没有意义
+* 已知数据集测试算法有效性（目前打算使用：KDD'99）
+* 服务器异常流量的检测标准（adpative learning or other methods）
+
+##### Work Arrangements
+
+* [FAST] Save model for Shengjieluo: HDFS /fangliang/KmeansModel && 
+* [TEST] 测试带标签的数据集KDD'99
+* [Consideration] 服务器异常流量的常用检测方法
+
+#### May 1st, 2017 Monday
+
+##### Work Arrangements
+
+* PPT for SecurityDefenceIntroduction
+* 论文提纲与主要内容（摘要部分，测试部分）
+* 毕业设计工作日志

@@ -12,6 +12,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.rdd.PairRDDFunctions
 import org.apache.spark.rdd.RDD
 import org.apache.spark.rdd.RDD.rddToPairRDDFunctions
+import org.apache.spark.
 
 object AnomalyDetection {
     
@@ -657,7 +658,6 @@ object AnomalyDetection {
                         
                         populateHorizontalPortScan(event).alert()
                     }  
-                    HogHBaseHistogram.saveHistogram(Histograms.mergeMax(savedHistogram, new HogHistogram("",numberOfflows,histogram)))
                 }
         }
 

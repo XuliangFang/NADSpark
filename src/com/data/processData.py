@@ -101,4 +101,4 @@ def processData(arg1, arg2):
     return
 
 if __name__=='__main__':
-    processData('/home/hadoop/trojanData/rawdata_v2.txt', '/home/hadoop/trojanData/normalizeDataSet_v2.txt')
+    processData('/home/u928/jrj2/dataForTrojan/data.txt', '/home/hadoop/trojanData/normalizeDataSet_v2.txt')
